@@ -2,7 +2,9 @@ package wci.frontend.java;
 
 import wci.frontend.Parser;
 import wci.frontend.Token;
-import wci.message.*;
+import wci.message.Message;
+import static wci.message.MessageType.SYNTAX_ERROR;
+import static wci.frontend.java.JavaErrorCode.TOO_MANY_ERRORS;
 
 /**
  * Created by phucnguyen on 9/16/15.

@@ -6,7 +6,7 @@ import wci.frontend.java.JavaErrorHandler;
 import wci.message.Message;
 
 import static wci.frontend.java.JavaErrorCode.IO_ERROR;
-import static wci.frontend.java.tokens.JavaTokenType.ERROR;
+import static wci.frontend.java.JavaTokenType.ERROR;
 import static wci.message.MessageType.PARSER_SUMMARY;
 import static wci.message.MessageType.TOKEN;
 

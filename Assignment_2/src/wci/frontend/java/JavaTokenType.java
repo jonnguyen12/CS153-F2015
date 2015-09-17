@@ -1,4 +1,4 @@
-package wci.frontend.java.tokens;
+package wci.frontend.java;
 
 import wci.frontend.TokenType;
 
