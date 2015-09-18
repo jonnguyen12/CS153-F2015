@@ -59,9 +59,9 @@ public class JavaStringToken extends JavaToken
             }
         } while ((currentChar != '\'') && (currentChar != EOF));
 
-        if (currentChar == '\'') {
+        if (currentChar == '\"') {
             nextChar();  // consume final quote
-            textBuffer.append('\'');
+            textBuffer.append('\"');
 
             type = STRING;
             value = valueBuffer.toString();
