@@ -26,8 +26,7 @@ public class JavaStringToken extends JavaToken
      * Extract a Java string token from the source.
      * @throws Exception if an error occurred.
      */
-    protected void extract()
-            throws Exception
+    protected void extract() throws Exception
     {
         StringBuilder textBuffer = new StringBuilder();
         StringBuilder valueBuffer = new StringBuilder();
@@ -36,39 +35,66 @@ public class JavaStringToken extends JavaToken
         textBuffer.append('"');
 
         // Get string characters.
-        do {
-            // Replace any whitespace character with a blank.
-            if (Character.isWhitespace(currentChar)) {
-                currentChar = ' ';
-            }
+        do
+        {
+            // escape character
+            if (currentChar == '\\')
+            {
+                currentChar = nextChar(); //consume '\' character
 
-            if ((currentChar != '\"') && (currentChar != EOF)) {
+                if (currentChar == 'n') {
+                    textBuffer.append("\\n");
+                    valueBuffer.append("\n");
+                }
+                else if (currentChar == 't') {
+                    textBuffer.append("\\t");
+                    valueBuffer.append("\t");
+                }
+                else if (currentChar == '"') {
+                    textBuffer.append("\\\"");
+                    valueBuffer.append(currentChar);
+                }
+                else if (currentChar == '\\' || currentChar == '\'') {
+                    textBuffer.append(currentChar);
+                    valueBuffer.append(currentChar);
+                }
+                else if (currentChar == '\n') {
+                    valueBuffer.append(currentChar);
+                    valueBuffer.deleteCharAt(valueBuffer.length() - 1);
+                } else {
+                    type = ERROR;
+                    value = INVALID_CHARACTER;
+                }
+
+                currentChar = nextChar(); // consume the escape character, valid it or not
+            } else if (currentChar == EOL)
+            {
+                type = ERROR;
+                value = INVALID_STRING;
+            } else if (type != ERROR && (currentChar != '"') && (currentChar != EOF))
+            {
                 textBuffer.append(currentChar);
                 valueBuffer.append(currentChar);
                 currentChar = nextChar();  // consume character
             }
+        } while (type != ERROR && (currentChar != '"') && (currentChar != EOF));
 
-            // Quote?  Each pair of adjacent quotes represents a single-quote.
-            if (currentChar == '\"') {
-                while ((currentChar == '\'') && (peekChar() == '\"')) {
-                    textBuffer.append("'");
-                    valueBuffer.append(currentChar); // append single-quote
-                    currentChar = nextChar();        // consume pair of quotes
-                    currentChar = nextChar();
-                }
+        if (type != ERROR)
+        {
+            if (currentChar == '"')
+            {
+                nextChar();  // consume final quote
+                textBuffer.append('"');
+
+                type = STRING;
+                value = valueBuffer.toString();
+            } else
+            {
+                type = ERROR;
+                value = UNEXPECTED_EOF;
             }
-        } while ((currentChar != '\'') && (currentChar != EOF));
-
-        if (currentChar == '\"') {
-            nextChar();  // consume final quote
-            textBuffer.append('\"');
-
-            type = STRING;
-            value = valueBuffer.toString();
-        }
-        else {
-            type = ERROR;
-            value = UNEXPECTED_EOF;
+        }else{
+            currentChar = nextChar();
         }
 
         text = textBuffer.toString();

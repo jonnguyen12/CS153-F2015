@@ -28,53 +28,54 @@ public class JavaCharacterToken extends JavaToken {
      * Extract a Java string token from the source.
      * @throws Exception if an error occurred.
      */
-    protected void extract()
-        throws Exception
+    protected void extract() throws Exception
     {
         StringBuilder textBuffer = new StringBuilder();
-        StringBuilder valueBuffer = new StringBuilder();
 
         char currentChar = nextChar();  // consume initial quote
         textBuffer.append('\'');
 
-        // if it is an escape character
-        if (peekChar() == '\\') {
-            currentChar = nextChar();
-            textBuffer.append(currentChar);
-           
-            currentChar = nextChar();
-            if (currentChar == '\\' || currentChar == '\'' || currentChar == 'n' ||
-            		currentChar == 't')
-            {
-            	textBuffer.append(currentChar);
+        if (currentChar == '\\') {   // check for escape character
+            currentChar = nextChar();  // consume '\' character
+            textBuffer.append('\\');
+
+            if (currentChar == '\\' || currentChar == '\'' || currentChar == 'n' || currentChar == 't') {
+                textBuffer.append(currentChar);
+            } else {
+                type = ERROR;
+                value = INVALID_CHARACTER;
             }
-            
-            if (type != ERROR) 
-            {
-            	currentChar = nextChar();
-            	if (currentChar == '\'') {
-            		textBuffer.append(currentChar);
-            		nextChar();
-            		type = CHARACTER;
-            		value = textBuffer.toString();
-            	}
-            	else {
-            		type = ERROR;
-            		value = UNEXPECTED_EOF;
-            	}
+
+
+            if (type != ERROR) {
+                currentChar = nextChar();
+
+                if (currentChar == '\'') {
+                    textBuffer.append('\'');
+                    nextChar(); // consume final quote
+                    type = CHARACTER;
+                    value = textBuffer.toString();
+                }
+                else {
+                    type = ERROR;
+                    value = UNEXPECTED_EOF;
+                }
             }
-            
-            else {
-            	type = ERROR;
-            	value = INVALID_CHARACTER;
-            }
-            
-            
         }
-        // else it is just a normal character, do this
-        else {
-            type = ERROR;
-            value = UNEXPECTED_EOF;
+        else { // if the character is normal, no escape
+            textBuffer.append(currentChar);
+            currentChar = nextChar(); // consume character
+
+            if (currentChar == '\'') {
+                nextChar();  // consume final quote
+                textBuffer.append('\'');
+                type = CHARACTER;
+                value = textBuffer.toString();
+            }
+            else {
+                type = ERROR;
+                value = UNEXPECTED_EOF;
+            }
         }
 
         text = textBuffer.toString();
