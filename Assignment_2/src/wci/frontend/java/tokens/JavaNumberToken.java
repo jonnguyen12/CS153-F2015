@@ -1,6 +1,6 @@
 package wci.frontend.java.tokens;
 
-import wci.frontend.Source;
+import wci.frontend.*;
 import wci.frontend.java.*;
 import static wci.frontend.java.JavaErrorCode.*;
 import static wci.frontend.java.JavaTokenType.*;

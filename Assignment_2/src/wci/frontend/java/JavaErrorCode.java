@@ -34,6 +34,7 @@ public enum JavaErrorCode
     INVALID_STATEMENT("Invalid statement"),
     INVALID_STRING("Invalid string"),
     INVALID_TYPE("Invalid type expression"),
+    INVALID_NUMBER("Invalid number"),
     
     
     MISSING_COLON("Missing :"),
