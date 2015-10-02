@@ -2,11 +2,11 @@ package wci.backend.interpreter.executors;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 
 import wci.intermediate.*;
 import wci.intermediate.icodeimpl.*;
 import wci.backend.interpreter.*;
-
 import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
 import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.*;
 import static wci.intermediate.icodeimpl.ICodeKeyImpl.*;
@@ -93,6 +93,31 @@ public class ExpressionExecutor extends StatementExecutor
                 boolean value = (Boolean) execute(expressionNode);
                 return !value;
             }
+            case SET:
+            {
+            	 ArrayList<ICodeNode> children = node.getChildren();
+            	 ArrayList<ICodeNode> subchildren = node.getChildren();
+            	 HashSet<Integer> values = new HashSet<>();
+            	 values.clear();
+            	 
+            	 for(ICodeNode chil : children)
+            	 {
+            		if( chil.getType() == SUBRANGE)
+            		{
+            			Object frt = execute(subchildren.get(0));
+            			Integer first = (Integer) frt;
+            			Object lst = execute(subchildren.get(1));
+            			Integer last = (Integer) lst;
+            			for(int i = first; i<=last;i++ )
+            			{
+            				values.add(i);
+            			}
+            		}
+            		//else( chil.getType() == ADD)
+            	 }
+            	
+            	
+            }
 
             // Must be a binary operator.
             default: return executeBinaryOperator(node, nodeType);
@@ -124,6 +149,8 @@ public class ExpressionExecutor extends StatementExecutor
         boolean integerMode = (operand1 instanceof Integer) &&
                               (operand2 instanceof Integer);
 
+        
+        boolean setMode = (operand1 instanceof HashSet) && (operand2 instanceof HashSet);
         // ====================
         // Arithmetic operators
         // ====================
@@ -175,6 +202,51 @@ public class ExpressionExecutor extends StatementExecutor
                         }
                     }
                 }
+            }
+            else if (setMode)
+            {
+            	HashSet<Integer> addset = new HashSet<Integer>() ;
+            	HashSet<Integer> value1;
+            	HashSet<Integer> value2;
+            	if(operand1 instanceof HashSet)
+            		value1 = (HashSet<Integer>) operand1;
+            	else
+            		value1 = null;
+            	if(operand2 instanceof HashSet)
+            		value2 = (HashSet<Integer>) operand2;
+            	else
+            		value2 = null;
+            	
+            	switch(nodeType)
+            	{
+            	case ADD:
+            		
+            		for(Integer num : value1)
+            			addset.add(num);
+            		for(Integer num : value2)
+            			addset.add(num);
+            		
+            		return addset;
+            	case SUBTRACT:
+            		for(Integer num : value1)
+            		{
+            			if(!value2.contains(num))
+            				addset.add(num);
+            			return addset;
+            		}
+            	case MULTIPLY:
+            		for(Integer num : value1)
+            		{
+            			if(value2.contains(num))
+            				addset.add(num);
+            		}
+            		
+            		return addset;
+            	
+            	}
+            	
+           
+            	
             }
             else {
                 float value1 = operand1 instanceof Integer
