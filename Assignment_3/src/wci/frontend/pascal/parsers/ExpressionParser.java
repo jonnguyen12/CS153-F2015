@@ -2,6 +2,7 @@ package wci.frontend.pascal.parsers;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import wci.frontend.*;
 import wci.frontend.pascal.*;
@@ -33,6 +34,11 @@ public class ExpressionParser extends StatementParser
         super(parent);
     }
 
+    // Synchronization set for starting an expression.
+    static final EnumSet<PascalTokenType> EXPR_START_SET =
+        EnumSet.of(PLUS, MINUS, IDENTIFIER, INTEGER, REAL, STRING,
+                   PascalTokenType.NOT, LEFT_PAREN, LEFT_BRACKET);
+
     /**
      * Parse an expression.
      * @param token the initial token.
@@ -48,7 +54,7 @@ public class ExpressionParser extends StatementParser
     // Set of relational operators.
     private static final EnumSet<PascalTokenType> REL_OPS =
         EnumSet.of(EQUALS, NOT_EQUALS, LESS_THAN, LESS_EQUALS,
-                   GREATER_THAN, GREATER_EQUALS);
+                   GREATER_THAN, GREATER_EQUALS, IN);
 
     // Map relational operator tokens to node types.
     private static final HashMap<PascalTokenType, ICodeNodeType>
@@ -60,6 +66,7 @@ public class ExpressionParser extends StatementParser
         REL_OPS_MAP.put(LESS_EQUALS, LE);
         REL_OPS_MAP.put(GREATER_THAN, GT);
         REL_OPS_MAP.put(GREATER_EQUALS, GE);
+        REL_OPS_MAP.put(IN, IN_SET);
     };
 
     /**
@@ -87,11 +94,26 @@ public class ExpressionParser extends StatementParser
             ICodeNode opNode = ICodeFactory.createICodeNode(nodeType);
             opNode.addChild(rootNode);
 
+            ICodeNodeTypeImpl type = (ICodeNodeTypeImpl) opNode.getType();
+            if (type == LT || type == GT || type == IN_SET) {
+                if (rootNode.getType() == ICodeNodeTypeImpl.SET) {
+                    errorHandler.flag(token, INVALID_OPERATOR, this);
+
+                }
+            }
+
+            Token previousToken = token;
             token = nextToken();  // consume the operator
 
             // Parse the second simple expression.  The operator node adopts
             // the simple expression's tree as its second child.
-            opNode.addChild(parseSimpleExpression(token));
+            ICodeNode rightNode = parseSimpleExpression(token);
+            opNode.addChild(rightNode);
+
+            if (opNode.getType() == IN_SET && rightNode.getType() == INTEGER_CONSTANT) {
+                errorHandler.flag(previousToken, INVALID_OPERATOR, this);
+
+            }
 
             // The operator node becomes the new root node.
             rootNode = opNode;
@@ -202,6 +224,10 @@ public class ExpressionParser extends StatementParser
         token = currentToken();
         TokenType tokenType = token.getType();
 
+        if (rootNode.getType() == ICodeNodeTypeImpl.SET && (tokenType == PascalTokenType.OR || tokenType == PascalTokenType.AND)) {
+            errorHandler.flag(token, INVALID_OPERATOR, this);
+        }
+
         // Loop over multiplicative operators.
         while (MULT_OPS.contains(tokenType)) {
 
@@ -210,6 +236,15 @@ public class ExpressionParser extends StatementParser
             ICodeNodeType nodeType = MULT_OPS_OPS_MAP.get(tokenType);
             ICodeNode opNode = ICodeFactory.createICodeNode(nodeType);
             opNode.addChild(rootNode);
+
+            switch ((ICodeNodeTypeImpl) opNode.getType()) {
+                case INTEGER_DIVIDE:
+                case FLOAT_DIVIDE:
+                    if (rootNode.getType() == ICodeNodeTypeImpl.SET) {
+                        errorHandler.flag(token, INVALID_OPERATOR, this);
+                    }
+            }
+
 
             token = nextToken();  // consume the operator
 
@@ -319,9 +354,124 @@ public class ExpressionParser extends StatementParser
                 break;
             }
 
+
+            case LEFT_BRACKET: {
+                token = nextToken();      // consume the [
+
+                // Parse an expression and make its node the root node
+                rootNode = parseSet(token);
+
+                // Look for the matching ] token.
+                token = currentToken();
+                if (token.getType() == RIGHT_BRACKET) {
+                    token = nextToken();  // consume the ]
+                } else {
+                    errorHandler.flag(token, MISSING_RIGHT_BRACKET, this);
+                }
+                break;
+            }
+
+
             default: {
                 errorHandler.flag(token, UNEXPECTED_TOKEN, this);
                 break;
+            }
+        }
+
+        return rootNode;
+    }
+
+    private static final HashMap<PascalTokenType, ICodeNodeTypeImpl> SET_OPS_MAP = new HashMap<>();
+
+    static {
+        // Mapping EnumSet SET_OPS to ICodeNodeTypes
+        ADD_OPS_OPS_MAP.put(PascalTokenType.OR, ICodeNodeTypeImpl.OR);
+    }
+
+    /**
+     * Parse a set.
+     * @param token the initial token.
+     * @return the root of the generated parse subtree.
+     * @throws Exception if an error occurred.
+     */
+    private ICodeNode parseSet(Token token)
+            throws Exception {
+        ICodeNode rootNode = ICodeFactory.createICodeNode(ICodeNodeTypeImpl.SET);
+        HashSet<Integer> values = new HashSet<>();
+        rootNode.setAttribute(VALUE, new HashSet<Integer>());
+        boolean isFinished = false;
+
+        while (token.getType() != RIGHT_BRACKET && token.getType() != ERROR && !isFinished) {
+            ICodeNode leftNode = parseSimpleExpression(token);
+
+            if (leftNode.getType() == INTEGER_CONSTANT
+                    && !values.add((Integer) leftNode.getAttribute(VALUE)))
+            {
+                errorHandler.flag(token, NON_UNIQUE_MEMBERS, this);
+            }
+
+            token = currentToken();
+
+            switch ((PascalTokenType) token.getType()) {
+                case RIGHT_BRACKET:
+                    rootNode.addChild(leftNode);
+                    break;
+                case COMMA:
+                    rootNode.addChild(leftNode);
+                    token = nextToken(); // Consume the ,
+                    if (token.getType() == COMMA) {
+                        errorHandler.flag(token, EXTRA_COMMAS, this);
+                        token = nextToken(); // Consume the extra ,
+                    }
+                    break;
+                case DOT_DOT:
+                    token = nextToken(); // Consume the ..
+                    if (token.getType() == COMMA) {
+                        errorHandler.flag(token, INVALID_SUBRANGE, this);
+                        token = nextToken(); // Consume the ,
+                        rootNode.addChild(leftNode);
+                    }
+                    else {
+                        ICodeNode rightNode = parseSimpleExpression(token);
+                        ICodeNode subrangeNode = ICodeFactory.createICodeNode(SUBRANGE);
+                        subrangeNode.addChild(leftNode);
+                        subrangeNode.addChild(rightNode);
+                        rootNode.addChild(subrangeNode);
+
+                        if (leftNode.getType() == INTEGER_CONSTANT && rightNode.getType() == INTEGER_CONSTANT) {
+                            boolean duplicateFound = false;
+                            Integer leftRange = (Integer) leftNode.getAttribute(VALUE) + 1;
+                            Integer rightRange = (Integer) rightNode.getAttribute(VALUE);
+
+                            while (leftRange <= rightRange) {
+                                if (!values.add(leftRange++) && !duplicateFound) {
+                                    errorHandler.flag(token, NON_UNIQUE_MEMBERS, this);
+                                    duplicateFound = true;
+                                }
+                            }
+                        }
+
+                        token = currentToken();
+                        if (token.getType() == COMMA) {
+                            token = nextToken(); // Consume the ,
+                        }
+                        else if (token.getType() != RIGHT_BRACKET) {
+                            errorHandler.flag(token, MISSING_COMMA, this);
+                        }
+                    }
+                    break;
+
+                case INTEGER:
+                    errorHandler.flag(token, MISSING_COMMA, this);
+                    break;
+
+                case SEMICOLON:
+                    isFinished = true;
+                    break;
+
+                default:
+                    errorHandler.flag(token, UNEXPECTED_TOKEN, this);
+                    break;
             }
         }
 

@@ -21,7 +21,7 @@ public enum ICodeNodeTypeImpl implements ICodeNodeType
 
     // Relational operators
     EQ, NE, LT, LE, GT, GE, NOT,
-    
+
     //set subrange
     SUBRANGE, IN_SET,
 

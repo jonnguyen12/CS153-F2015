@@ -12,6 +12,7 @@ public enum PascalErrorCode
 {
     ALREADY_FORWARDED("Already specified in FORWARD"),
     CASE_CONSTANT_REUSED("CASE constant reused"),
+    EXTRA_COMMAS("Extra commas"),
     IDENTIFIER_REDEFINED("Redefined identifier"),
     IDENTIFIER_UNDEFINED("Undefined identifier"),
     INCOMPATIBLE_ASSIGNMENT("Incompatible assignment"),
@@ -26,7 +27,9 @@ public enum PascalErrorCode
     INVALID_IDENTIFIER_USAGE("Invalid identifier usage"),
     INVALID_INDEX_TYPE("Invalid index type"),
     INVALID_NUMBER("Invalid number"),
+    INVALID_OPERATOR("Invalid operator"),
     INVALID_STATEMENT("Invalid statement"),
+    INVALID_SUBRANGE("Invalid range of values"),
     INVALID_SUBRANGE_TYPE("Invalid subrange type"),
     INVALID_TARGET("Invalid assignment target"),
     INVALID_TYPE("Invalid type"),
@@ -35,7 +38,7 @@ public enum PascalErrorCode
     MISSING_BEGIN("Missing BEGIN"),
     MISSING_COLON("Missing :"),
     MISSING_COLON_EQUALS("Missing :="),
-    MISSING_COMMA("Missing ,"),
+    MISSING_COMMA("Missing comma"),
     MISSING_CONSTANT("Missing constant"),
     MISSING_DO("Missing DO"),
     MISSING_DOT_DOT("Missing .."),
@@ -54,6 +57,7 @@ public enum PascalErrorCode
     MISSING_TO_DOWNTO("Missing TO or DOWNTO"),
     MISSING_UNTIL("Missing UNTIL"),
     MISSING_VARIABLE("Missing variable"),
+    NON_UNIQUE_MEMBERS("Non-unique members"),
     NOT_CONSTANT_IDENTIFIER("Not a constant identifier"),
     NOT_RECORD_VARIABLE("Not a record variable"),
     NOT_TYPE_IDENTIFIER("Not a type identifier"),
@@ -67,7 +71,6 @@ public enum PascalErrorCode
     UNIMPLEMENTED("Unimplemented feature"),
     UNRECOGNIZABLE("Unrecognizable input"),
     WRONG_NUMBER_OF_PARMS("Wrong number of actual parameters"),
-
     // Fatal errors.
     IO_ERROR(-101, "Object I/O error"),
     TOO_MANY_ERRORS(-102, "Too many syntax errors");
