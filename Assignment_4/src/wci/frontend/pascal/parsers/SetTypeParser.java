@@ -1,7 +1,9 @@
 package wci.frontend.pascal.parsers;
 
+import com.sun.tools.corba.se.idl.SymtabEntry;
 import wci.frontend.Token;
 import wci.frontend.pascal.PascalParserTD;
+import wci.frontend.pascal.PascalToken;
 import wci.frontend.pascal.PascalTokenType;
 import wci.intermediate.Definition;
 import wci.intermediate.SymTabEntry;
@@ -23,30 +25,81 @@ public class SetTypeParser extends TypeSpecificationParser {
     }
 
     // Synchronization set for Set type
-//    static final EnumSet<PascalTokenType> SET_START_SET = EnumSet.of(SEMICOLON);
+    static final EnumSet<PascalTokenType> SET_START_SET = EnumSet.of(SEMICOLON);
 
 
-    public TypeSpec parse(Token token)
-            throws Exception {
+//    public TypeSpec parse(Token token)
+//            throws Exception {
+//        TypeSpec setType = TypeFactory.createType(SET);
+//        token = nextToken();
+//
+//        if (token.getType() != OF) {
+//            errorHandler.flag(token, MISSING_OF, this);
+//        } else {
+//            token = nextToken();
+//        }
+//
+//        TypeSpec elementType = parseElementType(token);
+//        setType.setAttribute(SET_ELEMENT_TYPE, elementType);
+//        return setType;
+//    }
+//
+//
+//    private TypeSpec parseElementType(Token token)
+//            throws Exception {
+//        TypeSpecificationParser typeSpecificationParser =
+//                new TypeSpecificationParser(this);
+//        return typeSpecificationParser.parse(token);
+//    }
+
+    public TypeSpec parse(Token token ) throws Exception {
         TypeSpec setType = TypeFactory.createType(SET);
         token = nextToken();
 
-        if (token.getType() != OF) {
-            errorHandler.flag(token, MISSING_OF, this);
-        } else {
+        if (token.getType() == PascalTokenType.OF) {
             token = nextToken();
+
+
+            switch ((PascalTokenType) token.getType()) {
+                case IDENTIFIER:
+                    String name = token.getText().toLowerCase();
+                    SymTabEntry id = symTabStack.lookup(name);
+
+                    if (id != null) {
+                        Definition definition = id.getDefinition();
+                        if (definition == DefinitionImpl.TYPE) {
+                            id.appendLineNumber(token.getLineNumber());
+                            token = nextToken();
+                            setType.setAttribute(BASE_TYPE, id.getTypeSpec());
+
+                            return setType;
+                        } else {
+                            token = synchronize(SET_START_SET);
+                            return null;
+                        }
+                    } else {
+                        token = synchronize(SET_START_SET);
+                        return null;
+                    }
+                case INTEGER:
+                    SubrangeTypeParser subrangeTypeParser = new SubrangeTypeParser(this);
+                    TypeSpec subrange = subrangeTypeParser.parse(token);
+                    setType.setAttribute(UNNAMED_SET_VALUES, subrange);
+                    return setType;
+                case LEFT_PAREN:
+                    EnumerationTypeParser enumerationTypeParser = new EnumerationTypeParser(this);
+                    TypeSpec enumeration = enumerationTypeParser.parse(token);
+                    setType.setAttribute(UNNAMED_SET_VALUES, enumeration);
+                    return setType;
+                default:
+                    token = synchronize(SET_START_SET);
+                    return null;
+            }
         }
-
-        TypeSpec elementType = parseElementType(token);
-        setType.setAttribute(SET_ELEMENT_TYPE, elementType);
-        return setType;
-    }
-
-
-    private TypeSpec parseElementType(Token token)
-            throws Exception {
-        TypeSpecificationParser typeSpecificationParser =
-                new TypeSpecificationParser(this);
-        return typeSpecificationParser.parse(token);
+        else {
+            token = synchronize(SET_START_SET);
+            errorHandler.flag(token, MISSING_OF, this);
+            return null;
+        }
     }
 }
