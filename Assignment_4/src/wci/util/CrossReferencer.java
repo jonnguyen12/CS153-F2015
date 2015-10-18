@@ -277,6 +277,21 @@ public class CrossReferencer
                 recordTypes.add(type);
                 break;
             }
+
+            case SET: {
+                TypeSpec unnamedSetValues = (TypeSpec) type.getAttribute(UNNAMED_SET_VALUES);
+                TypeSpec baseType = (TypeSpec) type.getAttribute(SET_ELEMENT_TYPE);
+
+                if (baseType != null) {
+                    System.out.println(INDENT + "--- BASE TYPE ---");
+                    printType(baseType);
+                }
+                else if (unnamedSetValues != null) {
+                    System.out.println(INDENT + "--- BASE TYPE ---");
+                    printType(unnamedSetValues);
+                    printTypeDetail(unnamedSetValues, recordTypes);
+                }
+            }
         }
     }
 

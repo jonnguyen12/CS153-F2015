@@ -41,6 +41,9 @@ public class ExpressionParser extends StatementParser
         EnumSet.of(PLUS, MINUS, IDENTIFIER, INTEGER, REAL, STRING,
                    PascalTokenType.NOT, LEFT_PAREN);
 
+    // Synchronization set for skipping an invalid statement
+    static final EnumSet<PascalTokenType> SKIP_STATEMENT_SET =  EnumSet.of(SEMICOLON);
+
     /**
      * Parse an expression.
      * @param token the initial token.

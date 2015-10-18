@@ -22,15 +22,18 @@ public class SetTypeParser extends TypeSpecificationParser {
         super(parent);
     }
 
+    // Synchronization set for Set type
+//    static final EnumSet<PascalTokenType> SET_START_SET = EnumSet.of(SEMICOLON);
+
+
     public TypeSpec parse(Token token)
-            throws Exception
-    {
+            throws Exception {
         TypeSpec setType = TypeFactory.createType(SET);
         token = nextToken();
-        if(token.getType() != OF) {
+
+        if (token.getType() != OF) {
             errorHandler.flag(token, MISSING_OF, this);
-        }
-        else {
+        } else {
             token = nextToken();
         }
 
@@ -38,11 +41,10 @@ public class SetTypeParser extends TypeSpecificationParser {
         setType.setAttribute(SET_ELEMENT_TYPE, elementType);
         return setType;
     }
-    
-    
+
+
     private TypeSpec parseElementType(Token token)
-            throws Exception
-    {
+            throws Exception {
         TypeSpecificationParser typeSpecificationParser =
                 new TypeSpecificationParser(this);
         return typeSpecificationParser.parse(token);
