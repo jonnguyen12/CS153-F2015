@@ -117,6 +117,14 @@ public class TypeSpecImpl
     }
 
     /**
+     * @return the clone of this type
+     */
+
+    public TypeSpec clone() {
+        return (TypeSpec) super.clone();
+    }
+
+    /**
      * @return the base type of this type.
      */
     public TypeSpec baseType()

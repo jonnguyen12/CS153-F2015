@@ -48,7 +48,14 @@ public interface TypeSpec
     public boolean isPascalString();
 
     /**
+     * @return the clone of this type
+     */
+    public TypeSpec clone();
+
+    /**
      * @return the base type of this type.
      */
     public TypeSpec baseType();
+
+
 }

@@ -153,8 +153,15 @@ public class VariableDeclarationsParser extends DeclarationsParser
         TypeSpec type = parseTypeSpec(token);
 
         // Assign the type specification to each identifier in the list.
-        for (SymTabEntry variableId : sublist) {
-            variableId.setTypeSpec(type);
+//        for (SymTabEntry variableId : sublist) {
+//            variableId.setTypeSpec(type);
+//        }
+        if (type != null) {
+            for (SymTabEntry id : sublist) {
+                TypeSpec clone = type.clone();
+                clone.setIdentifier(id);
+                id.setTypeSpec(clone);
+            }
         }
 
         return sublist;

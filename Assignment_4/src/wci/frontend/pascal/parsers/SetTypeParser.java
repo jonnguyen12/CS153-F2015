@@ -1,9 +1,7 @@
 package wci.frontend.pascal.parsers;
 
-import com.sun.tools.corba.se.idl.SymtabEntry;
 import wci.frontend.Token;
 import wci.frontend.pascal.PascalParserTD;
-import wci.frontend.pascal.PascalToken;
 import wci.frontend.pascal.PascalTokenType;
 import wci.intermediate.Definition;
 import wci.intermediate.SymTabEntry;
@@ -84,15 +82,15 @@ public class SetTypeParser extends TypeSpecificationParser {
                 case INTEGER:
                     SubrangeTypeParser subrangeTypeParser = new SubrangeTypeParser(this);
                     TypeSpec subrange = subrangeTypeParser.parse(token);
-                    setType.setAttribute(UNNAMED_SET_VALUES, subrange);
+                    setType.setAttribute(NAMELESS_SET_TYPE, subrange);
                     return setType;
                 case LEFT_PAREN:
                     EnumerationTypeParser enumerationTypeParser = new EnumerationTypeParser(this);
                     TypeSpec enumeration = enumerationTypeParser.parse(token);
-                    setType.setAttribute(UNNAMED_SET_VALUES, enumeration);
+                    setType.setAttribute(NAMELESS_SET_TYPE, enumeration);
                     return setType;
                 default:
-                    token = synchronize(SET_START_SET);
+                    synchronize(SET_START_SET);
                     return null;
             }
         }

@@ -485,7 +485,8 @@ public class ExpressionParser extends StatementParser
             }
 
             default: {
-                errorHandler.flag(token, UNEXPECTED_TOKEN, this);
+//                errorHandler.flag(token, UNEXPECTED_TOKEN, this);
+                synchronize(SKIP_STATEMENT_SET);
             }
         }
 
