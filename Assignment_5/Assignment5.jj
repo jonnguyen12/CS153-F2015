@@ -1,0 +1,83 @@
+options {
+    BUILD_PARSER=false;
+    IGNORE_CASE=true;
+    OUTPUT_DIRECTORY="src/";
+    //DEBUG_TOKEN_MANAGER=true;
+}
+
+PARSER_BEGIN(Assignment5)
+    public class Assignment5 {}
+PARSER_END(Assignment5)
+
+TOKEN_MGR_DECLS : {
+    public static void main(String[] args)
+    {
+
+        StringBuilder fileString = new StringBuilder();
+        java.io.BufferedReader br = null;
+        try {
+            br = new java.io.BufferedReader(new java.io.FileReader("input.txt"));
+            int i = 0;
+            char[] buffer = new char[1024];
+
+            while ((i = br.read(buffer)) != -1)
+                fileString.append(buffer, 0, i);
+        }
+        catch (java.io.IOException ex) {
+        }
+        finally {
+            try {
+                br.close();
+            }
+            catch (java.io.IOException ex) {
+            }
+        }
+        java.io.StringReader sr = new java.io.StringReader(fileString.toString());
+        SimpleCharStream scs = new SimpleCharStream(sr);
+        Assignment5TokenManager mgr = new Assignment5TokenManager(scs);
+
+        while (mgr.getNextToken().kind != EOF) {}
+    }
+}
+
+SKIP : {
+   <IGNORE : [" ", ",", "\r", "\n"]>
+}
+
+TOKEN : {
+   //reserved words
+   <RESERVED_WORD:
+    "abstract" | "default" | "goto" | "package" | "synchronized"
+   | "assert" | "do" | "if" | "private" | "this"
+   | "boolean" | "double" | "implements" | "protected" | "throw"
+   | "break" | "else" | "import" | "public" | "throws"
+   | "byte" | "enum" | "instanceof" | "return" | "transient"
+   | "case" | "extends" | "int" | "short" | "true"
+   | "catch" | "false" | "interface" | "static" | "try"
+   | "char" | "final" | "long" | "strictfp" | "void"
+   | "class" | "finally" | "native" | "super" | "volatile"
+   | "const" | "float" | "new" | "switch" | "while"
+   | "continue" | "for" | "null" >
+		{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+	
+   //special symbols
+    |<SPECIAL_SYMBOL:
+    "~" | "!" | "@" | "%" | "^" | "&" | "*" | "-" | "+" | "="
+    | "|" | "/" | ":" | ";" | "?" | "<" | ">" | "." | ","
+    | "'" | "\"" | "(" | ")" | "[" | "]" | "{" | "}"
+    | "++" | "--" | "<<" | ">>" | "<=" | ">=" | "+=" | "-="
+    | "*=" | "/=" | "==" | "!=" | "%=" | "&=" | "^=" | "||"
+    | "&&" | "!=" | "<<=" | ">>=">
+ 		{ debugStream.println("SPECIAL_SYMBOL token: " + matchedToken.image); }
+
+	//identifier
+    | <IDENTIFIER : <LETTER> (<LETTER> | <DIGIT> | "_")*>
+        { debugStream.println("IDENTIFIER token: " + matchedToken.image); }	 		
+		
+   //letter
+   | < #LETTER: ["a"-"z", "A"-"Z"] >
+   
+   //digits
+   | < #DIGIT: ["0"-"9"] >
+   
+}
