@@ -41,10 +41,17 @@ TOKEN_MGR_DECLS : {
 
 SKIP : {
    <IGNORE : [" ", ",", "\r", "\n"]>
+
 }
 
+
 TOKEN : {
+
+   //character
+   < CHARACTER: "'" (< LETTER > | < DIGIT >)"'" >
+          { debugStream.println("CHARACTER token: " + matchedToken.image); }
    //reserved words
+   | 
    <RESERVED_WORD:
     "abstract" | "default" | "goto" | "package" | "synchronized"
    | "assert" | "do" | "if" | "private" | "this"
