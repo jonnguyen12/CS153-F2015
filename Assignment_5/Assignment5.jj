@@ -108,7 +108,7 @@ TOKEN : {
     //letter
    | < #LETTER: ["a"-"z", "A"-"Z"] >
    
-   //digits
+   //digits 
     | <#DIGIT: ["0"-"9"]>
    
 }

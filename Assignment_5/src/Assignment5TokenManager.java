@@ -22,7 +22,7 @@ public class Assignment5TokenManager implements Assignment5Constants
             try {
                 br.close();
             }
-            catch (java.io.IOException ex) {
+            catch (java.io.IOException ex) {  
             }
         }
         java.io.StringReader sr = new java.io.StringReader(fileString.toString());
