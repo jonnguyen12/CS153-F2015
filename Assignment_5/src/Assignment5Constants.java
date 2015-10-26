@@ -12,7 +12,7 @@ public interface Assignment5Constants {
   int IGNORE = 1;
   /** RegularExpression Id. */
   int CHARACTER = 6;
-  /** RegularExpression Id. */ 
+  /** RegularExpression Id. */
   int STRING = 7;
   /** RegularExpression Id. */
   int RESERVED_WORD = 8;
