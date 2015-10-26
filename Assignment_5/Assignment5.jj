@@ -42,17 +42,28 @@ TOKEN_MGR_DECLS : {
 SKIP : {
    <IGNORE : [" ", "\r", "\n", "\t"]>
    |< "//" (~["\n", "\r"])* >
+  | <"/*"> : MULTILINE_COMMENT
+}
 
+<MULTILINE_COMMENT> SKIP: {
+    "*/" : DEFAULT
+}
+
+<MULTILINE_COMMENT> MORE: {
+    <~[]>
 }
 
 
 TOKEN : {
 
    //character
-   < CHARACTER: "'" (< LETTER > | < DIGIT >)"'" >
+   <CHARACTER: "'" (<LETTER>|<DIGIT>|"\\")"'" >
           { debugStream.println("CHARACTER token: " + matchedToken.image); }
    //reserved words
-   | 
+   |
+   <STRING: "\""(~["\n","\r"])*"\"">
+        { debugStream.println("STRING token: " + matchedToken.image); }
+    |
    <RESERVED_WORD:
     "abstract" | "default" | "goto" | "package" | "synchronized"
    | "assert" | "do" | "if" | "private" | "this"
@@ -80,11 +91,24 @@ TOKEN : {
 	//identifier
    | <IDENTIFIER : <LETTER> (<LETTER> | <DIGIT> | "_")*>
         { debugStream.println("IDENTIFIER token: " + matchedToken.image); }	 		
-		
+	   |
+    <REAL_NUMBER: (<DIGIT>)+ "." (<DIGIT>)*(<EXPONENT>)?
+    | (<DIGIT>)+ (".")? (<DIGIT>)* <EXPONENT>
+    | (<DIGIT>)* "." (<DIGIT>)+ (<EXPONENT>)?
+    | (<DIGIT>)* (".")? (<DIGIT>)+ <EXPONENT>>
+        { debugStream.println("REAL_NUMBER token: " + matchedToken.image); }
+    | <INTEGER_NUMBER: <DECIMAL> | <OCTAL> | <HEXADECIMAL>>
+        { debugStream.println("INTEGER_NUMBER token: " + matchedToken.image); }
+    | <#DECIMAL: ["1"-"9"] (["0"-"9"])*>
+    | <#OCTAL: "0" (["0"-"7"])*>
+	//HEXADECIMAL
+    | <#HEXADECIMAL: ("0x"|"0X") (<DIGIT>|<LETTER>)+>
+	//EXPONENT
+    | <#EXPONENT: ("E"|"e") ("+"|"-")? (<DIGIT>)+>	
     //letter
    | < #LETTER: ["a"-"z", "A"-"Z"] >
    
-    //digits
-   | < #DIGIT: ["0"-"9"] >
+   //digits
+    | <#DIGIT: ["0"-"9"]>
    
 }

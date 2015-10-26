@@ -11,30 +11,56 @@ public interface Assignment5Constants {
   /** RegularExpression Id. */
   int IGNORE = 1;
   /** RegularExpression Id. */
-  int CHARACTER = 3;
+  int CHARACTER = 6;
   /** RegularExpression Id. */
-  int RESERVED_WORD = 4;
+  int STRING = 7;
   /** RegularExpression Id. */
-  int SPECIAL_SYMBOL = 5;
+  int RESERVED_WORD = 8;
   /** RegularExpression Id. */
-  int IDENTIFIER = 6;
+  int SPECIAL_SYMBOL = 9;
   /** RegularExpression Id. */
-  int LETTER = 7;
+  int IDENTIFIER = 10;
   /** RegularExpression Id. */
-  int DIGIT = 8;
+  int REAL_NUMBER = 11;
+  /** RegularExpression Id. */
+  int INTEGER_NUMBER = 12;
+  /** RegularExpression Id. */
+  int DECIMAL = 13;
+  /** RegularExpression Id. */
+  int OCTAL = 14;
+  /** RegularExpression Id. */
+  int HEXADECIMAL = 15;
+  /** RegularExpression Id. */
+  int EXPONENT = 16;
+  /** RegularExpression Id. */
+  int LETTER = 17;
+  /** RegularExpression Id. */
+  int DIGIT = 18;
 
   /** Lexical state. */
   int DEFAULT = 0;
+  /** Lexical state. */
+  int MULTILINE_COMMENT = 1;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
     "<IGNORE>",
     "<token of kind 2>",
+    "\"/*\"",
+    "\"*/\"",
+    "<token of kind 5>",
     "<CHARACTER>",
+    "<STRING>",
     "<RESERVED_WORD>",
     "<SPECIAL_SYMBOL>",
     "<IDENTIFIER>",
+    "<REAL_NUMBER>",
+    "<INTEGER_NUMBER>",
+    "<DECIMAL>",
+    "<OCTAL>",
+    "<HEXADECIMAL>",
+    "<EXPONENT>",
     "<LETTER>",
     "<DIGIT>",
   };
