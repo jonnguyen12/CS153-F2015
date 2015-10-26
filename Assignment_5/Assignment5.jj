@@ -60,7 +60,7 @@ TOKEN : {
    <CHARACTER: "'" (<LETTER>|<DIGIT>|"\\")"'" >
           { debugStream.println("CHARACTER token: " + matchedToken.image); }
    //reserved words
-   | 
+   |
    <STRING: "\""(~["\n","\r"])*"\"">
         { debugStream.println("STRING token: " + matchedToken.image); }
     |
