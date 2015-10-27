@@ -10,7 +10,7 @@ public interface Assignment5Constants {
   int EOF = 0;
   /** RegularExpression Id. */
   int IGNORE = 1;
-  /** RegularExpression Id. */
+  /** RegularExpression Id. */ 
   int CHARACTER = 6;
   /** RegularExpression Id. */
   int STRING = 7;

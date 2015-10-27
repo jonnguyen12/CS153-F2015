@@ -15,7 +15,7 @@ public class Assignment5TokenManager implements Assignment5Constants
 
             while ((i = br.read(buffer)) != -1)
                 fileString.append(buffer, 0, i);
-        }
+        } 
         catch (java.io.IOException ex) {
         }
         finally {
