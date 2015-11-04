@@ -170,3 +170,55 @@ java.lang.NullPointerException
 	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:669)
 	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:608)
 	at org.eclipse.equinox.launcher.Main.run(Main.java:1515)
+!SESSION 2015-10-26 15:17:05.742 -----------------------------------------------
+eclipse.buildId=4.5.1.M20150904-0015
+java.version=1.8.0_65
+java.vendor=Oracle Corporation
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.java.product -keyring /Users/phucnguyen/.eclipse_keyring -showlocation
+Command-line arguments:  -os macosx -ws cocoa -arch x86_64 -product org.eclipse.epp.package.java.product -keyring /Users/phucnguyen/.eclipse_keyring -showlocation
+
+!ENTRY org.eclipse.core.net 1 0 2015-10-26 15:17:07.566
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences
+!SESSION 2015-10-26 17:28:07.544 -----------------------------------------------
+eclipse.buildId=4.5.1.M20150904-0015
+java.version=1.8.0_65
+java.vendor=Oracle Corporation
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.java.product -product org.eclipse.epp.package.java.product -product org.eclipse.epp.package.java.product -keyring /Users/phucnguyen/.eclipse_keyring -showlocation
+Command-line arguments:  -os macosx -ws cocoa -arch x86_64 -product org.eclipse.epp.package.java.product -product org.eclipse.epp.package.java.product -data /Users/phucnguyen/Dropbox/FALL 2015 CLASSES/CS 153/CS153-F2015 -product org.eclipse.epp.package.java.product -keyring /Users/phucnguyen/.eclipse_keyring -showlocation
+
+!ENTRY org.eclipse.core.net 1 0 2015-10-26 17:28:08.832
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences
+!SESSION 2015-11-01 11:35:49.418 -----------------------------------------------
+eclipse.buildId=4.5.1.M20150904-0015
+java.version=1.8.0_65
+java.vendor=Oracle Corporation
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.java.product -keyring /Users/phucnguyen/.eclipse_keyring -showlocation
+Command-line arguments:  -os macosx -ws cocoa -arch x86_64 -product org.eclipse.epp.package.java.product -keyring /Users/phucnguyen/.eclipse_keyring -showlocation
+
+!ENTRY org.eclipse.core.net 1 0 2015-11-01 11:35:50.451
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.core.jobs 4 2 2015-11-01 11:36:07.465
+!MESSAGE An internal error occurred during: "Setup check".
+!STACK 0
+org.eclipse.emf.common.util.BasicEList$BasicIndexOutOfBoundsException: index=0, size=0
+	at org.eclipse.emf.common.util.BasicEList.get(BasicEList.java:346)
+	at org.eclipse.oomph.setup.internal.core.SetupContext.getInstallation(SetupContext.java:633)
+	at org.eclipse.oomph.setup.internal.core.SetupContext.createSelf(SetupContext.java:219)
+	at org.eclipse.oomph.setup.ui.SetupUIPlugin.performStartup(SetupUIPlugin.java:429)
+	at org.eclipse.oomph.setup.ui.SetupUIPlugin.access$3(SetupUIPlugin.java:323)
+	at org.eclipse.oomph.setup.ui.SetupUIPlugin$1$1.run(SetupUIPlugin.java:223)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+!SESSION 2015-11-03 19:10:13.292 -----------------------------------------------
+eclipse.buildId=4.5.1.M20150904-0015
+java.version=1.8.0_65
+java.vendor=Oracle Corporation
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.java.product -keyring /Users/phucnguyen/.eclipse_keyring -showlocation
+Command-line arguments:  -os macosx -ws cocoa -arch x86_64 -product org.eclipse.epp.package.java.product -keyring /Users/phucnguyen/.eclipse_keyring -showlocation
+
+!ENTRY org.eclipse.core.net 1 0 2015-11-03 19:10:14.651
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences
