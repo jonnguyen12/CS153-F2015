@@ -1,0 +1,127 @@
+options {
+    BUILD_PARSER=true;
+
+
+}
+PARSER_BEGIN(CLikeParser)
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+
+public class CLikeParser
+{
+    public static void main(String [] args) throws IOException
+    {
+      	byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
+	  	String content = new String(encoded, StandardCharsets.UTF_8);
+        java.io.StringReader sr = new java.io.StringReader(content);
+        CLikeParser parser = new CLikeParser(sr);
+        try {
+            parser.Statements();
+        }
+        catch (ParseException ex) {
+            ex.printStackTrace();
+        }
+    }		
+}
+PARSER_END(CLikeParser)
+
+TOKEN_MGR_DECLS : {
+    public static void main(String [] args) throws IOException
+    {
+	    byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
+	    String content = new String(encoded, StandardCharsets.UTF_8);
+        java.io.StringReader sr = new java.io.StringReader(content);
+        SimpleCharStream scs = new SimpleCharStream(sr);
+        CLikeParserTokenManager mgr = new CLikeParserTokenManager(scs);
+
+		while (mgr.getNextToken().kind != EOF) {}
+    }
+}
+
+
+SKIP : {
+   <IGNORE : [" ", "\r", "\n", "\t"]>
+   |< "//" (~["\n", "\r"])* >
+  | <"/*"> : MULTILINE_COMMENT
+}
+
+<MULTILINE_COMMENT> SKIP: {
+    "*/" : DEFAULT
+}
+
+<MULTILINE_COMMENT> MORE: {
+    <~[]>
+}
+
+
+// TOKENS
+//Reserved Words
+TOKEN : {
+ 	<IF : "if">
+ 	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+	| <ELSE : "else">
+ 	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+ 	| <VOID : "void">
+ 	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+ 	| <DOUBLE : "double">
+ 	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+ 	| <INT : "int">
+ 	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+ 	| <CHAR : "char">
+ 	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+
+}
+//Special Symbols
+TOKEN : {< NOT : "!" >
+{ debugStream.println("NOT SYMBOL token: " + matchedToken.image); }
+| < PLUS : "+" >
+{ debugStream.println("PLUS SYMBOL token: " + matchedToken.image); }
+| < MINUS : "-" >
+{ debugStream.println("MINUS SYMBOL token: " + matchedToken.image); }
+| < EQUAL : "=" >
+{ debugStream.println("EQUAL SYMBOL token: " + matchedToken.image); }
+| < SEMICOLON: ";" >
+{ debugStream.println("SEMICOLON SYMBOL token: " + matchedToken.image); }
+}  
+
+
+
+
+//identifier
+TOKEN : {	< IDENTIFIER : < LETTER > (< LETTER > | < DIGIT > | "_")* >
+}
+//numbers
+TOKEN : {<INTEGER: (<SIGN>)? (<DIGIT>)+ >
+ { debugStream.println("INTEGER TOKEN: " + matchedToken.image); }
+| <REAL:  (<SIGN>)? (<DIGIT>)+ "." | (<SIGN>)? "." (<DIGIT>)+ | (<SIGN>)? (<DIGIT>)+ "." (<DIGIT>)+ >
+{ debugStream.println("REAL TOKEN: " + matchedToken.image); }
+}
+
+//Base regular expressionsTOKEN : {
+  < #DIGIT : ["0" - "9"] >
+| < #LETTER : ["a" - "z", "A" - "Z"] >
+| < #SIGN : "-" | "+" >
+}    
+
+
+// BCNF RULES
+
+void Statement() : {}
+{
+	Assignment() //| FunctionDeclaration() | IfStatment() | CompoundStatement()
+}
+
+void Assignment() : {}
+{
+  	//temp assignment for testing	< IDENTIFIER > <EQUAL > <INTEGER ><SEMICOLON >
+}
+
+//parser starts here
+void Statements() : {}
+{	(Statement())*
+}
+
