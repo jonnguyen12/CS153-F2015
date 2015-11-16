@@ -74,7 +74,9 @@ TOKEN : {
  	| <CHAR : "char">
  	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
   	| <WHILE : "while">
- 	{ debugStream.println("WHILE token: " + matchedToken.image); }	 	
+ 	{ debugStream.println("WHILE token: " + matchedToken.image); }
+  	| <RETURN : "return">
+ 	{ debugStream.println("RETURN token: " + matchedToken.image); }	 	
 
 }
 //Special Symbols
@@ -84,6 +86,10 @@ TOKEN : {< NOT : "!" >
 { debugStream.println("PLUS SYMBOL token: " + matchedToken.image); }
 | < MINUS : "-" >
 { debugStream.println("MINUS SYMBOL token: " + matchedToken.image); }
+| < MULTIPLY: "*" >
+{ debugStream.println("MULTIPLY SYMBOL token: " + matchedToken.image); }
+| < DIVIDE : "/" >
+{ debugStream.println("DIVIDE SYMBOL token: " + matchedToken.image); }
 | < EQUAL : "=" >
 { debugStream.println("EQUAL SYMBOL token: " + matchedToken.image); }
 | < EQUAL_BOOL : "==" >
@@ -110,6 +116,10 @@ TOKEN : {< NOT : "!" >
 { debugStream.println("GTE token: " + matchedToken.image); }
 | < NOT_EQUAL: "!=" >
 { debugStream.println("NOT_EQUAL token: " + matchedToken.image); }
+| < COMMA: "," >
+{ debugStream.println("COMMA token: " + matchedToken.image); }
+| < QUOTE: "\"" >
+{ debugStream.println("QUOTE token: " + matchedToken.image); }
 }  
 
 
@@ -119,12 +129,15 @@ TOKEN : {< NOT : "!" >
 TOKEN : {	< IDENTIFIER : < LETTER > (< LETTER > | < DIGIT > | "_")* >
 	{ debugStream.println("IDENTIFIER TOKEN: " + matchedToken.image); }	
 }
-//numbers
+//numbers and char
 TOKEN : {<INTEGER: (<SIGN>)? (<DIGIT>)+ >
  { debugStream.println("INTEGER TOKEN: " + matchedToken.image); }
 | <REAL:  (<SIGN>)? (<DIGIT>)+ "." | (<SIGN>)? "." (<DIGIT>)+ | (<SIGN>)? (<DIGIT>)+ "." (<DIGIT>)+ >
 { debugStream.println("REAL TOKEN: " + matchedToken.image); }
-
+| < CHARACTER : <SINGLEQUOTE> (~[]){1} <SINGLEQUOTE>>
+{ debugStream.println("CHARACTER token: " + matchedToken.image); }
+| < STRING : <QUOTE> (~["\""])* <QUOTE>>
+{ debugStream.println("STRING token: " + matchedToken.image); }
 }
 
 //Base regular expressionsTOKEN : {
@@ -153,27 +166,38 @@ void Statement() : {}
 	|{System.out.println("=PARSING FUNCTION DECLORATION=");}
 	 FunctionDeclaration()
 	 {System.out.println("=FUNCTION DECLORATION END=");}
+	|{System.out.println("=PARSING FUNCTION CALL=");}
+	 FunctionCall()
+	 {System.out.println("=FUNCTION CALL END=");}	 
 	|{System.out.println("=PARSING IF STATEMENT=");}
 	 IfStatment()
 	 {System.out.println("=ENDING IF STATEMENT=");}
 	|{System.out.println("=PARSING WHILE LOOP=");}
 	whileLoop()
 	{System.out.println("=ENDING WHILE LOOP=");}
+    | {System.out.println("=PARSING RETURN STATEMENT=");}
+      returnStatement()
+      {System.out.println("=END RETURN STATEMENT=");}
 	
 }
 
 void Assignment() : {}
 {
   	//assignment statments eg (i = 0, i; or ;)
-	(DataType())? < IDENTIFIER > (<EQUAL> assignmentType())? <SEMICOLON >
+	(DataType())? < IDENTIFIER > (<EQUAL> ExpressionOrSingleType())? <SEMICOLON >
 
 }
 
 
 
 void FunctionDeclaration() : {}
-{	DataType() < IDENTIFIER ><LEFT_PAREN > (Assignment())? < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+{	DataType() < IDENTIFIER ><LEFT_PAREN > (ExpressionOrSingleType()(<COMMA >)?)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
+
+void FunctionCall() : {}
+{	< IDENTIFIER ><LEFT_PAREN >(ExpressionOrSingleType() (<COMMA >)?)* < RIGHT_PAREN > <SEMICOLON >
+}
+
 
 void IfStatment() : {}
 {	If_Part() (Else_Part())?
@@ -191,10 +215,14 @@ void whileLoop() : {}
 {
   < WHILE > <LEFT_PAREN > Conditions() < RIGHT_PAREN > <LEFT_BRACKET> Statements() < RIGHT_BRACKET >}
 
+void returnStatement() : {}
+{	< RETURN > ExpressionOrSingleType() < SEMICOLON >
+}
 
-//CONDITIONS eg ( a == 9, b <4  ect)
+
+//CONDITIONS eg ( a == 9, b <4  ect, can be no condition aswell)
 void Conditions() : {}
-{	((<IDENTIFIER> | < INTEGER > | < REAL >) booleanOperators() (<INTEGER> | < REAL >))?
+{	(ExpressionOrSingleType() booleanOperators() ExpressionOrSingleType())?
 }  
 
 void DataType() : {}
@@ -204,12 +232,28 @@ void DataType() : {}
 	| < CHAR >
 }
 
+
 void booleanOperators() : {}
 {	< EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE >
 }
 
+void ExpressionOrSingleType() : {}
+{
+	LOOKAHEAD(2)
+	Expression() | assignmentType()
+}
+
+//types that can be assigned to a variable
 void assignmentType() : {}
-{	< INTEGER > | < REAL > | < IDENTIFIER >
+{	< INTEGER > | < REAL > | < IDENTIFIER > | < CHARACTER > |< STRING > 
+}
+
+void Expression() : {}
+{		assignmentType() arethmeticOperators() assignmentType()
+}
+
+void arethmeticOperators() : {}
+{	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE >
 }
 
 void identifier() : {}{	< IDENTIFIER >
