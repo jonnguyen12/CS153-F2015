@@ -73,8 +73,6 @@ TOKEN : {
  	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
  	| <CHAR : "char">
  	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
-  	| <FUNCTION : "function">
- 	{ debugStream.println("FUNCTION token: " + matchedToken.image); }
   	| <WHILE : "while">
  	{ debugStream.println("WHILE token: " + matchedToken.image); }	 	
 
@@ -147,7 +145,7 @@ void Statements() : {}
 
 void Statement() : {}
 {
-
+	LOOKAHEAD(3)
 	{System.out.println("=PARSING ASSIGNMENT=");}
 	Assignment()
 	{System.out.println("=END ASSIGNMENT=");}
@@ -165,7 +163,6 @@ void Statement() : {}
 
 void Assignment() : {}
 {
-	
   	//assignment statments eg (i = 0, i; or ;)
 	(DataType())? < IDENTIFIER > (<EQUAL> assignmentType())? <SEMICOLON >
 
@@ -175,7 +172,7 @@ void Assignment() : {}
 
 void FunctionDeclaration() : {}
 {
-  //added function keyword to distinguish functions from assignment, could look for possible fix.	<FUNCTION > DataType() < IDENTIFIER ><LEFT_PAREN > (Assignment())? < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+  //added function keyword to distinguish functions from assignment, could look for possible fix.	DataType() < IDENTIFIER ><LEFT_PAREN > (Assignment())? < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 
 void IfStatment() : {}

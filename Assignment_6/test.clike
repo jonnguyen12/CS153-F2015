@@ -1,4 +1,4 @@
-function int main() {
+int main() {
 	int test = 9;
 	if() {
 		double hello = 1.23;
