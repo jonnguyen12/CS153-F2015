@@ -1,4 +1,7 @@
-
-test = 678;
-
-test2 =898;
+function int main() {
+	int test = 9;
+	if(this == 6) {
+		double hello = 1.23;
+	}	
+	else { while(j == 4) { j = number; }
+}

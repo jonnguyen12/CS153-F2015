@@ -73,6 +73,10 @@ TOKEN : {
  	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
  	| <CHAR : "char">
  	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+  	| <FUNCTION : "function">
+ 	{ debugStream.println("FUNCTION token: " + matchedToken.image); }
+  	| <WHILE : "while">
+ 	{ debugStream.println("WHILE token: " + matchedToken.image); }	 	
 
 }
 //Special Symbols
@@ -84,8 +88,20 @@ TOKEN : {< NOT : "!" >
 { debugStream.println("MINUS SYMBOL token: " + matchedToken.image); }
 | < EQUAL : "=" >
 { debugStream.println("EQUAL SYMBOL token: " + matchedToken.image); }
+| < EQUAL_BOOL : "==" >
+{ debugStream.println("EQUAL BOOLEAN SYMBOL token: " + matchedToken.image); }
 | < SEMICOLON: ";" >
 { debugStream.println("SEMICOLON SYMBOL token: " + matchedToken.image); }
+| < SINGLEQUOTE: "'" >
+{ debugStream.println("SINGLE QUOTE token: " + matchedToken.image); }
+| < LEFT_PAREN: "(" >
+{ debugStream.println("LEFT PAREN token: " + matchedToken.image); }
+| < RIGHT_PAREN: ")" >
+{ debugStream.println("RIGHT PAREN token: " + matchedToken.image); }
+| < LEFT_BRACKET: "{" >
+{ debugStream.println("LEFT BRACKET token: " + matchedToken.image); }
+| < RIGHT_BRACKET: "}" >
+{ debugStream.println("RIGHT BRACKET token: " + matchedToken.image); }
 }  
 
 
@@ -93,18 +109,21 @@ TOKEN : {< NOT : "!" >
 
 //identifier
 TOKEN : {	< IDENTIFIER : < LETTER > (< LETTER > | < DIGIT > | "_")* >
+	{ debugStream.println("IDENTIFIER TOKEN: " + matchedToken.image); }	
 }
-//numbers
+//numbers and chars
 TOKEN : {<INTEGER: (<SIGN>)? (<DIGIT>)+ >
  { debugStream.println("INTEGER TOKEN: " + matchedToken.image); }
 | <REAL:  (<SIGN>)? (<DIGIT>)+ "." | (<SIGN>)? "." (<DIGIT>)+ | (<SIGN>)? (<DIGIT>)+ "." (<DIGIT>)+ >
 { debugStream.println("REAL TOKEN: " + matchedToken.image); }
+
 }
 
 //Base regular expressionsTOKEN : {
   < #DIGIT : ["0" - "9"] >
 | < #LETTER : ["a" - "z", "A" - "Z"] >
 | < #SIGN : "-" | "+" >
+
 }    
 
 
@@ -112,16 +131,73 @@ TOKEN : {<INTEGER: (<SIGN>)? (<DIGIT>)+ >
 
 void Statement() : {}
 {
-	Assignment() //| FunctionDeclaration() | IfStatment() | CompoundStatement()
+
+	{System.out.println("PARSING ASSIGNMENT");}
+	Assignment()
+	{System.out.println("END ASSIGNMENT");}
+	|{System.out.println("PARSING FUNCTION DECLORATION");}
+	 FunctionDeclaration()
+	 {System.out.println("FUNCTION DECLORATION END");}
+	|{System.out.println("PARSING IF STATEMENT");}
+	 IfStatment()
+	 {System.out.println("ENDING IF STATEMENT");}
+	|{System.out.println("PARSING WHILE LOOP");}
+	whileLoop()
+	{System.out.println("ENDING WHILE LOOP");}
+	
 }
 
 void Assignment() : {}
 {
-  	//temp assignment for testing	< IDENTIFIER > <EQUAL > <INTEGER ><SEMICOLON >
+	
+  	//assignment statments eg (i = 0, i; or ;)
+	(DataType())? < IDENTIFIER > (<EQUAL> assignmentType())? <SEMICOLON >
+
 }
 
 //parser starts here
 void Statements() : {}
 {	(Statement())*
-}
+}
+
+void FunctionDeclaration() : {}
+{
+  //added function keyword to distinguish functions from assignment, could look for possible fix.	<FUNCTION > DataType() < IDENTIFIER ><LEFT_PAREN > (Assignment())? < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+}
+
+void IfStatment() : {}
+{	If_Part() (Else_Part())?
+}
+
+void If_Part() : {}
+{
+  < IF > <LEFT_PAREN > Conditions() < RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >}
+
+void Else_Part() : {}
+{
+  < ELSE > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >}
+
+void whileLoop() : {}
+{
+  < WHILE > <LEFT_PAREN > Conditions() < RIGHT_PAREN ><LEFT_BRACKET > }
+//THIS IS PLACE HOLDER, WE PROB NEED CONDITIONS eg ( a == 9, b <4  ect)
+void Conditions() : {}
+{	(< IDENTIFIER> <EQUAL_BOOL > <INTEGER >)?
+}  
+
+void DataType() : {}
+{	< VOID >
+	| < INT >
+	| < DOUBLE >
+	| < CHAR >
+}
+
+void assignmentType() : {}
+{	< INTEGER > | < REAL > | < IDENTIFIER >
+}
+
+void identifier() : {}{	< IDENTIFIER >
+}
+
+
 
