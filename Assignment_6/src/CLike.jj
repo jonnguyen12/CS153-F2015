@@ -76,7 +76,9 @@ TOKEN : {
   	| <WHILE : "while">
  	{ debugStream.println("WHILE token: " + matchedToken.image); }
   	| <RETURN : "return">
- 	{ debugStream.println("RETURN token: " + matchedToken.image); }	 	
+ 	{ debugStream.println("RETURN token: " + matchedToken.image); }
+   	| <FOR : "for">
+ 	{ debugStream.println("FOR token: " + matchedToken.image); }	 		
 
 }
 //Special Symbols
@@ -94,6 +96,10 @@ TOKEN : {< NOT : "!" >
 { debugStream.println("EQUAL SYMBOL token: " + matchedToken.image); }
 | < EQUAL_BOOL : "==" >
 { debugStream.println("EQUAL BOOLEAN SYMBOL token: " + matchedToken.image); }
+| < INC : "++" >
+{ debugStream.println("INCRIMENT SYMBOL token: " + matchedToken.image); }
+| < DEC : "--" >
+{ debugStream.println("DECREMENT SYMBOL token: " + matchedToken.image); }
 | < SEMICOLON: ";" >
 { debugStream.println("SEMICOLON SYMBOL token: " + matchedToken.image); }
 | < SINGLEQUOTE: "'" >
@@ -166,7 +172,7 @@ void Statement() : {}
 	|{System.out.println("=PARSING FUNCTION DECLORATION=");}
 	 FunctionDeclaration()
 	 {System.out.println("=FUNCTION DECLORATION END=");}
-	|{System.out.println("=PARSING FUNCTION CALL=");}
+	|LOOKAHEAD(2){System.out.println("=PARSING FUNCTION CALL=");}
 	 FunctionCall()
 	 {System.out.println("=FUNCTION CALL END=");}	 
 	|{System.out.println("=PARSING IF STATEMENT=");}
@@ -178,12 +184,17 @@ void Statement() : {}
     | {System.out.println("=PARSING RETURN STATEMENT=");}
       returnStatement()
       {System.out.println("=END RETURN STATEMENT=");}
-	
+    |LOOKAHEAD(2){System.out.println("=PARSING SIMPLE STATEMENT=");}
+      SimpleStatement()
+      {System.out.println("=END SIMPLE STATEMENT=");}
+    | {System.out.println("=PARSING FOR LOOP=");}
+      forLoop()
+      {System.out.println("=END FOR LOOP=");}      	
 }
 
 void Assignment() : {}
 {
-  	//assignment statments eg (i = 0, i; or ;)
+  	//assignment statments eg (int i = 0.i = 0, i; or ;)
 	(DataType())? < IDENTIFIER > (<EQUAL> ExpressionOrSingleType())? <SEMICOLON >
 
 }
@@ -191,11 +202,16 @@ void Assignment() : {}
 
 
 void FunctionDeclaration() : {}
-{	DataType() < IDENTIFIER ><LEFT_PAREN > (ExpressionOrSingleType()(<COMMA >)?)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+{	DataType() < IDENTIFIER ><LEFT_PAREN > (DataType() ExpressionOrSingleType()(<COMMA >)?)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 
 void FunctionCall() : {}
 {	< IDENTIFIER ><LEFT_PAREN >(ExpressionOrSingleType() (<COMMA >)?)* < RIGHT_PAREN > <SEMICOLON >
+}
+
+//statments such as (z++;, z*z;)
+void SimpleStatement() : {}
+{	ExpressionOrSingleType() < SEMICOLON >
 }
 
 
@@ -215,14 +231,22 @@ void whileLoop() : {}
 {
   < WHILE > <LEFT_PAREN > Conditions() < RIGHT_PAREN > <LEFT_BRACKET> Statements() < RIGHT_BRACKET >}
 
+void forLoop() : {}
+{	< FOR ><LEFT_PAREN > Assignment() Conditions()< SEMICOLON > forInc()< RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+}
+//need to add support for statments like i = i+1
+void forInc() : {}
+{	< IDENTIFIER > (incOrDec())
+}
+
 void returnStatement() : {}
 {	< RETURN > ExpressionOrSingleType() < SEMICOLON >
 }
 
 
-//CONDITIONS eg ( a == 9, b <4  ect, can be no condition aswell)
+//CONDITIONS eg ( a == 9, b <4  ect
 void Conditions() : {}
-{	(ExpressionOrSingleType() booleanOperators() ExpressionOrSingleType())?
+{	ExpressionOrSingleType() booleanOperators() ExpressionOrSingleType()
 }  
 
 void DataType() : {}
@@ -245,15 +269,20 @@ void ExpressionOrSingleType() : {}
 
 //types that can be assigned to a variable
 void assignmentType() : {}
-{	< INTEGER > | < REAL > | < IDENTIFIER > | < CHARACTER > |< STRING > 
+{
+  LOOKAHEAD(2)	 (< INTEGER > | < REAL > | < IDENTIFIER > | < CHARACTER >)(incOrDec())* |< STRING > 
 }
 
 void Expression() : {}
-{		assignmentType() arethmeticOperators() assignmentType()
+{	assignmentType() (arethmeticOperators() assignmentType())*
 }
 
 void arethmeticOperators() : {}
 {	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE >
+}
+
+void incOrDec() : {}
+{	< INC > | < DEC >
 }
 
 void identifier() : {}{	< IDENTIFIER >
