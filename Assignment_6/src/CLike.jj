@@ -102,6 +102,16 @@ TOKEN : {< NOT : "!" >
 { debugStream.println("LEFT BRACKET token: " + matchedToken.image); }
 | < RIGHT_BRACKET: "}" >
 { debugStream.println("RIGHT BRACKET token: " + matchedToken.image); }
+| < GT: ">" >
+{ debugStream.println("GT token: " + matchedToken.image); }
+| < LT: "<" >
+{ debugStream.println("LT token: " + matchedToken.image); }
+| < LTE: "<=" >
+{ debugStream.println("LTE token: " + matchedToken.image); }
+| < GTE: ">=" >
+{ debugStream.println("GTE token: " + matchedToken.image); }
+| < NOT_EQUAL: "!=" >
+{ debugStream.println("NOT_EQUAL token: " + matchedToken.image); }
 }  
 
 
@@ -111,7 +121,7 @@ TOKEN : {< NOT : "!" >
 TOKEN : {	< IDENTIFIER : < LETTER > (< LETTER > | < DIGIT > | "_")* >
 	{ debugStream.println("IDENTIFIER TOKEN: " + matchedToken.image); }	
 }
-//numbers and chars
+//numbers
 TOKEN : {<INTEGER: (<SIGN>)? (<DIGIT>)+ >
  { debugStream.println("INTEGER TOKEN: " + matchedToken.image); }
 | <REAL:  (<SIGN>)? (<DIGIT>)+ "." | (<SIGN>)? "." (<DIGIT>)+ | (<SIGN>)? (<DIGIT>)+ "." (<DIGIT>)+ >
@@ -129,21 +139,27 @@ TOKEN : {<INTEGER: (<SIGN>)? (<DIGIT>)+ >
 
 // BCNF RULES
 
+//parser starts here
+void Statements() : {}
+{
+	(Statement())*
+}
+
 void Statement() : {}
 {
 
-	{System.out.println("PARSING ASSIGNMENT");}
+	{System.out.println("=PARSING ASSIGNMENT=");}
 	Assignment()
-	{System.out.println("END ASSIGNMENT");}
-	|{System.out.println("PARSING FUNCTION DECLORATION");}
+	{System.out.println("=END ASSIGNMENT=");}
+	|{System.out.println("=PARSING FUNCTION DECLORATION=");}
 	 FunctionDeclaration()
-	 {System.out.println("FUNCTION DECLORATION END");}
-	|{System.out.println("PARSING IF STATEMENT");}
+	 {System.out.println("=FUNCTION DECLORATION END=");}
+	|{System.out.println("=PARSING IF STATEMENT=");}
 	 IfStatment()
-	 {System.out.println("ENDING IF STATEMENT");}
-	|{System.out.println("PARSING WHILE LOOP");}
+	 {System.out.println("=ENDING IF STATEMENT=");}
+	|{System.out.println("=PARSING WHILE LOOP=");}
 	whileLoop()
-	{System.out.println("ENDING WHILE LOOP");}
+	{System.out.println("=ENDING WHILE LOOP=");}
 	
 }
 
@@ -155,10 +171,7 @@ void Assignment() : {}
 
 }
 
-//parser starts here
-void Statements() : {}
-{	(Statement())*
-}
+
 
 void FunctionDeclaration() : {}
 {
@@ -180,9 +193,11 @@ void Else_Part() : {}
 void whileLoop() : {}
 {
   < WHILE > <LEFT_PAREN > Conditions() < RIGHT_PAREN ><LEFT_BRACKET > }
-//THIS IS PLACE HOLDER, WE PROB NEED CONDITIONS eg ( a == 9, b <4  ect)
+
+
+//CONDITIONS eg ( a == 9, b <4  ect)
 void Conditions() : {}
-{	(< IDENTIFIER> <EQUAL_BOOL > <INTEGER >)?
+{	(< IDENTIFIER> booleanOperators() (<INTEGER> | < REAL >))?
 }  
 
 void DataType() : {}
@@ -190,6 +205,10 @@ void DataType() : {}
 	| < INT >
 	| < DOUBLE >
 	| < CHAR >
+}
+
+void booleanOperators() : {}
+{	< EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE >
 }
 
 void assignmentType() : {}
