@@ -171,8 +171,7 @@ void Assignment() : {}
 
 
 void FunctionDeclaration() : {}
-{
-  //added function keyword to distinguish functions from assignment, could look for possible fix.	DataType() < IDENTIFIER ><LEFT_PAREN > (Assignment())? < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+{	DataType() < IDENTIFIER ><LEFT_PAREN > (Assignment())? < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 
 void IfStatment() : {}
