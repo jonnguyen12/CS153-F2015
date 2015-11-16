@@ -3,7 +3,9 @@ function int main() {
 	if() {
 		double hello = 1.23;
 	}	
-	else { while(j <= 4) { j = number; }
+	else { while(j <= 4) { j = number; }}
+	
+	while(r <4) {real = 43.4;}
 }
 
 

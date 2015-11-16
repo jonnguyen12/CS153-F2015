@@ -192,7 +192,7 @@ void Else_Part() : {}
 
 void whileLoop() : {}
 {
-  < WHILE > <LEFT_PAREN > Conditions() < RIGHT_PAREN ><LEFT_BRACKET > }
+  < WHILE > <LEFT_PAREN > Conditions() < RIGHT_PAREN > <LEFT_BRACKET> Statements() < RIGHT_BRACKET >}
 
 
 //CONDITIONS eg ( a == 9, b <4  ect)
