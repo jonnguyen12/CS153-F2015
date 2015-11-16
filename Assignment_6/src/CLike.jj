@@ -145,6 +145,7 @@ void Statements() : {}
 
 void Statement() : {}
 {
+  	//looadhead 3 for distinguishing Assignments and function declorations.
 	LOOKAHEAD(3)
 	{System.out.println("=PARSING ASSIGNMENT=");}
 	Assignment()
@@ -193,7 +194,7 @@ void whileLoop() : {}
 
 //CONDITIONS eg ( a == 9, b <4  ect)
 void Conditions() : {}
-{	(< IDENTIFIER> booleanOperators() (<INTEGER> | < REAL >))?
+{	((<IDENTIFIER> | < INTEGER > | < REAL >) booleanOperators() (<INTEGER> | < REAL >))?
 }  
 
 void DataType() : {}
