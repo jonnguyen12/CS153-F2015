@@ -1,0 +1,328 @@
+options {
+    BUILD_PARSER=true;
+
+
+}
+PARSER_BEGIN(CLikeParser)
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+
+public class CLikeParser
+{
+    public static void main(String [] args) throws IOException
+    {
+      	byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
+	  	String content = new String(encoded, StandardCharsets.UTF_8);
+        java.io.StringReader sr = new java.io.StringReader(content);
+        CLikeParser parser = new CLikeParser(sr);
+        try {
+            SimpleNode root = parser.Statements();
+            System.out.println("=====PRINTING PARSE TREE=====");
+            root.dump(">");
+            System.out.println("=====ENDING PARSE TREE=====");            
+        }
+        catch (ParseException ex) {
+            ex.printStackTrace();
+        }
+    }		
+}
+PARSER_END(CLikeParser)
+
+TOKEN_MGR_DECLS : {
+    public static void main(String [] args) throws IOException
+    {
+	    byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
+	    String content = new String(encoded, StandardCharsets.UTF_8);
+        java.io.StringReader sr = new java.io.StringReader(content);
+        SimpleCharStream scs = new SimpleCharStream(sr);
+        CLikeParserTokenManager mgr = new CLikeParserTokenManager(scs);
+
+		while (mgr.getNextToken().kind != EOF) {}
+    }
+}
+
+
+SKIP : {
+   <IGNORE : [" ", "\r", "\n", "\t"]>
+   |< "//" (~["\n", "\r"])* >
+  | <"/*"> : MULTILINE_COMMENT
+}
+
+<MULTILINE_COMMENT> SKIP: {
+    "*/" : DEFAULT
+}
+
+<MULTILINE_COMMENT> MORE: {
+    <~[]>
+}
+
+
+// TOKENS
+//Reserved Words
+TOKEN : {
+ 	<IF : "if">
+ 	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+	| <ELSE : "else">
+ 	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+ 	| <VOID : "void">
+ 	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+ 	| <DOUBLE : "double">
+ 	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+ 	| <INT : "int">
+ 	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+ 	| <CHAR : "char">
+ 	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
+  	| <WHILE : "while">
+ 	{ debugStream.println("WHILE token: " + matchedToken.image); }
+  	| <RETURN : "return">
+ 	{ debugStream.println("RETURN token: " + matchedToken.image); }
+   	| <FOR : "for">
+ 	{ debugStream.println("FOR token: " + matchedToken.image); }	 		
+
+}
+//Special Symbols
+TOKEN : {
+< NOT : "!" >
+{ debugStream.println("NOT SYMBOL token: " + matchedToken.image); }
+| < PLUS : "+" >
+{ debugStream.println("PLUS SYMBOL token: " + matchedToken.image); }
+| < MINUS : "-" >
+{ debugStream.println("MINUS SYMBOL token: " + matchedToken.image); }
+| < MULTIPLY: "*" >
+{ debugStream.println("MULTIPLY SYMBOL token: " + matchedToken.image); }
+| < DIVIDE : "/" >
+{ debugStream.println("DIVIDE SYMBOL token: " + matchedToken.image); }
+| < EQUAL : "=" >
+{ debugStream.println("EQUAL SYMBOL token: " + matchedToken.image); }
+| < EQUAL_BOOL : "==" >
+{ debugStream.println("EQUAL BOOLEAN SYMBOL token: " + matchedToken.image); }
+| < INC : "++" >
+{ debugStream.println("INCRIMENT SYMBOL token: " + matchedToken.image); }
+| < DEC : "--" >
+{ debugStream.println("DECREMENT SYMBOL token: " + matchedToken.image); }
+| < SEMICOLON: ";" >
+{ debugStream.println("SEMICOLON SYMBOL token: " + matchedToken.image); }
+| < SINGLEQUOTE: "'" >
+{ debugStream.println("SINGLE QUOTE token: " + matchedToken.image); }
+| < LEFT_PAREN: "(" >
+{ debugStream.println("LEFT PAREN token: " + matchedToken.image); }
+| < RIGHT_PAREN: ")" >
+{ debugStream.println("RIGHT PAREN token: " + matchedToken.image); }
+| < LEFT_BRACKET: "{" >
+{ debugStream.println("LEFT BRACKET token: " + matchedToken.image); }
+| < RIGHT_BRACKET: "}" >
+{ debugStream.println("RIGHT BRACKET token: " + matchedToken.image); }
+| < GT: ">" >
+{ debugStream.println("GT token: " + matchedToken.image); }
+| < LT: "<" >
+{ debugStream.println("LT token: " + matchedToken.image); }
+| < LTE: "<=" >
+{ debugStream.println("LTE token: " + matchedToken.image); }
+| < GTE: ">=" >
+{ debugStream.println("GTE token: " + matchedToken.image); }
+| < NOT_EQUAL: "!=" >
+{ debugStream.println("NOT_EQUAL token: " + matchedToken.image); }
+| < COMMA: "," >
+{ debugStream.println("COMMA token: " + matchedToken.image); }
+| < QUOTE: "\"" >
+{ debugStream.println("QUOTE token: " + matchedToken.image); }
+}
+
+  
+
+
+
+
+//identifier
+TOKEN : {
+	< IDENTIFIER : < LETTER > (< LETTER > | < DIGIT > | "_")* >
+	{ debugStream.println("IDENTIFIER TOKEN: " + matchedToken.image); }	
+}
+//numbers and char
+TOKEN : {
+<INTEGER: (<SIGN>)? (<DIGIT>)+ >
+ { debugStream.println("INTEGER TOKEN: " + matchedToken.image); }
+| <REAL:  (<SIGN>)? (<DIGIT>)+ "." | (<SIGN>)? "." (<DIGIT>)+ | (<SIGN>)? (<DIGIT>)+ "." (<DIGIT>)+ >
+{ debugStream.println("REAL TOKEN: " + matchedToken.image); }
+| < CHARACTER : <SINGLEQUOTE> (~[]){1} <SINGLEQUOTE>>
+{ debugStream.println("CHARACTER token: " + matchedToken.image); }
+| < STRING : <QUOTE> (~["\""])* <QUOTE>>
+{ debugStream.println("STRING token: " + matchedToken.image); }
+}
+
+//Base regular expressions
+TOKEN : {
+  < #DIGIT : ["0" - "9"] >
+| < #LETTER : ["a" - "z", "A" - "Z"] >
+| < #SIGN : "-" | "+" >
+
+}
+    
+
+
+// BCNF RULES
+
+//parser starts here
+SimpleNode Statements() : {}
+{
+	(Statement())*
+	{return jjtThis;}
+}
+
+void Statement() : {}
+{
+  	//looadhead 3 for distinguishing Assignments and function declorations.
+	LOOKAHEAD(3)
+	{System.out.println("=PARSING ASSIGNMENT=");}
+	Assignment()
+	{System.out.println("=END ASSIGNMENT=");}
+	|{System.out.println("=PARSING FUNCTION DECLORATION=");}
+	 FunctionDeclaration()
+	 {System.out.println("=FUNCTION DECLORATION END=");}
+	|LOOKAHEAD(2){System.out.println("=PARSING FUNCTION CALL=");}
+	 FunctionCall()
+	 {System.out.println("=FUNCTION CALL END=");}	 
+	|{System.out.println("=PARSING IF STATEMENT=");}
+	 IfStatment()
+	 {System.out.println("=ENDING IF STATEMENT=");}
+	|{System.out.println("=PARSING WHILE LOOP=");}
+	whileLoop()
+	{System.out.println("=ENDING WHILE LOOP=");}
+    | {System.out.println("=PARSING RETURN STATEMENT=");}
+      returnStatement()
+      {System.out.println("=END RETURN STATEMENT=");}
+    |LOOKAHEAD(2){System.out.println("=PARSING SIMPLE STATEMENT=");}
+      SimpleStatement()
+      {System.out.println("=END SIMPLE STATEMENT=");}
+    | {System.out.println("=PARSING FOR LOOP=");}
+      forLoop()
+      {System.out.println("=END FOR LOOP=");}      
+	
+}
+
+void Assignment() : {}
+{
+  	//assignment statments eg (int i = 0.i = 0, i; or ;)
+	(DataType())? identifier() (<EQUAL> ExpressionOrSingleType())? <SEMICOLON >
+
+}
+
+
+
+void FunctionDeclaration() : {}
+{
+	DataType() identifier() <LEFT_PAREN > (DataType() ExpressionOrSingleType()(<COMMA >)?)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+}
+
+void FunctionCall() : {}
+{
+	identifier() <LEFT_PAREN >(ExpressionOrSingleType() (<COMMA >)?)* < RIGHT_PAREN > <SEMICOLON >
+}
+
+//statments such as (z++;, z*z;)
+void SimpleStatement() : {}
+{
+	ExpressionOrSingleType() < SEMICOLON >
+}
+
+
+void IfStatment() : {}
+{
+	If_Part() (Else_Part())?
+}
+
+void If_Part() : {}
+{
+  < IF > <LEFT_PAREN > Conditions() < RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+}
+
+void Else_Part() : {}
+{
+  < ELSE > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+}
+
+void whileLoop() : {}
+{
+  < WHILE > <LEFT_PAREN > Conditions() < RIGHT_PAREN > <LEFT_BRACKET> Statements() < RIGHT_BRACKET >
+}
+
+void forLoop() : {}
+{
+	< FOR ><LEFT_PAREN > Assignment() Conditions()< SEMICOLON > forInc()< RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+}
+//need to add support for statments like i = i+1
+void forInc() : {}
+{
+	identifier() (incOrDec())
+}
+
+void returnStatement() : {}
+{
+	< RETURN > ExpressionOrSingleType() < SEMICOLON >
+}
+
+
+//CONDITIONS eg ( a == 9, b <4  ect
+void Conditions() : {}
+{
+	ExpressionOrSingleType() booleanOperators() ExpressionOrSingleType()
+}
+
+  
+
+void DataType() : {}
+{
+	< VOID >
+	| < INT >
+	| < DOUBLE >
+	| < CHAR >
+}
+
+
+void booleanOperators() : {Token t;}
+{
+	t = < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE >
+}
+
+void ExpressionOrSingleType() : {}
+{
+
+	LOOKAHEAD(2)
+	Expression() | assignmentType()
+}
+
+//types that can be assigned to a variable
+void assignmentType() : {}
+{
+  LOOKAHEAD(2)
+	 (< INTEGER > | < REAL > | identifier() | < CHARACTER >)(incOrDec())* |< STRING > 
+}
+
+void Expression() : {}
+{
+	assignmentType() (arethmeticOperators() assignmentType())*
+}
+
+void arethmeticOperators() : {}
+{
+	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE >
+}
+
+void incOrDec() : {}
+{
+	< INC > | < DEC >
+}
+
+void identifier() : {Token t;}
+{
+	t = < IDENTIFIER >
+	{jjtThis.jjtSetValue(t);}
+}
+
+
+
+
