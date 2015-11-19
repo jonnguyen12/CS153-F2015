@@ -184,6 +184,9 @@ void Statement() : {}
 	{System.out.println("=PARSING ASSIGNMENT=");}
 	Assignment()
 	{System.out.println("=END ASSIGNMENT=");}
+	|LOOKAHEAD(3){System.out.println("=PARSING VARIABLE DECLARATION=");}
+    variableDeclaration()
+    {System.out.println("=END VARIABLE DECLARATION=");}	
 	|LOOKAHEAD(2){System.out.println("=PARSING SIMPLE STATEMENT=");}
     SimpleStatement()
     {System.out.println("=END SIMPLE STATEMENT=");}
@@ -210,8 +213,15 @@ void Statement() : {}
 
 void Assignment() : {}
 {
+  	//assignment statments eg (i = 0, i; or ;)
+	identifier() (<EQUAL>	Expression())? <SEMICOLON >
+
+}
+
+void variableDeclaration() : {}
+{
   	//assignment statments eg (int i = 0.i = 0, i; or ;)
-	(DataType())? identifier() (<EQUAL>	Expression())? <SEMICOLON >
+	DataType() identifier() (<EQUAL>	Expression())? <SEMICOLON >
 
 }
 
@@ -260,7 +270,7 @@ void whileLoop() : {}
 
 void forLoop() : {}
 {
-	< FOR ><LEFT_PAREN > Assignment() Expression()< SEMICOLON > forInc()< RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+	< FOR ><LEFT_PAREN > variableDeclaration() Expression()< SEMICOLON > forInc()< RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 //need to add support for statments like i = i+1
 void forInc() : {}
