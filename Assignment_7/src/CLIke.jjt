@@ -126,6 +126,10 @@ TOKEN : {
 { debugStream.println("GTE token: " + matchedToken.image); }
 | < NOT_EQUAL: "!=" >
 { debugStream.println("NOT_EQUAL token: " + matchedToken.image); }
+| < OR: "||" >
+{ debugStream.println("OR token: " + matchedToken.image); }
+| < AND: "&&" >
+{ debugStream.println("AND token: " + matchedToken.image); }
 | < COMMA: "," >
 { debugStream.println("COMMA token: " + matchedToken.image); }
 | < QUOTE: "\"" >
@@ -290,7 +294,7 @@ void DataType() : {}
 
 void Operators() : {Token t;}
 {
-	t = < PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE >
+	t = < PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE > | < AND > | < OR >
 }
 
 
