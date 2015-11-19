@@ -215,12 +215,16 @@ void Assignment() : {}
 
 void FunctionDeclaration() : {}
 {
-	DataType() identifier() <LEFT_PAREN > (DataType() Expression()(<COMMA >)?)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+    //cant use paramaterList here since we need type declorations.
+	DataType() identifier() <LEFT_PAREN > (DataType() Expression()(<COMMA > DataType() Expression())?)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 
 void FunctionCall() : {}
 {
-	identifier() <LEFT_PAREN >(Expression() (<COMMA >)?)* < RIGHT_PAREN > 
+	identifier() <LEFT_PAREN > paramaterList() < RIGHT_PAREN > 
+}
+
+void paramaterList() : {}{	(Expression() (<COMMA > Expression())*)*
 }
 
 //statments such as (z++;, z*z;)
@@ -313,7 +317,6 @@ void identifier() : {Token t;}
 	t = < IDENTIFIER >
 	{jjtThis.jjtSetValue(t);}
 }
-
 
 
 
