@@ -1,38 +1,8 @@
-int main(){
-        int x = 40;
-        int y = 3;        
-        x++;
-        t = x;
-        x = t*t*t;
-        t = t++;
-        
-        char testChar = 'A';
+int main() {
 
-        
-        printf("Enter value for x :");
-        scanf("%d",x);
-        printf("Enter value for y :");
-        scanf("%d",y);
-        
-        if ( x > y ){
-                printf("X is large number - %d\n",x);
-        }
-        else{
-                printf("Y is large number - %d\n",y);
-        }
-        return 0;
+double foo(int x,int y) {
+	return x*y;
+}
 
-
-        for(int i=0;i < 5;i++) {
-        	for(int j=0;j<10;j++) {
-        		printf(i);
-        		printf(j);
-        	}
-        }
-        
-        int foo(int x , double y) {
-        	x+y;
-        }
-        
-        foo(4,5.6);
+int i = foo(3,4);
 }

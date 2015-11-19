@@ -180,6 +180,9 @@ void Statement() : {}
 	{System.out.println("=PARSING ASSIGNMENT=");}
 	Assignment()
 	{System.out.println("=END ASSIGNMENT=");}
+	|LOOKAHEAD(2){System.out.println("=PARSING SIMPLE STATEMENT=");}
+    SimpleStatement()
+    {System.out.println("=END SIMPLE STATEMENT=");}
 	|{System.out.println("=PARSING FUNCTION DECLORATION=");}
 	 FunctionDeclaration()
 	 {System.out.println("=FUNCTION DECLORATION END=");}
@@ -195,9 +198,6 @@ void Statement() : {}
     | {System.out.println("=PARSING RETURN STATEMENT=");}
       returnStatement()
       {System.out.println("=END RETURN STATEMENT=");}
-    |LOOKAHEAD(2){System.out.println("=PARSING SIMPLE STATEMENT=");}
-      SimpleStatement()
-      {System.out.println("=END SIMPLE STATEMENT=");}
     | {System.out.println("=PARSING FOR LOOP=");}
       forLoop()
       {System.out.println("=END FOR LOOP=");}      
@@ -207,7 +207,7 @@ void Statement() : {}
 void Assignment() : {}
 {
   	//assignment statments eg (int i = 0.i = 0, i; or ;)
-	(DataType())? identifier() (<EQUAL> ExpressionOrSingleType())? <SEMICOLON >
+	(DataType())? identifier() (<EQUAL>	Expression())? <SEMICOLON >
 
 }
 
@@ -215,18 +215,18 @@ void Assignment() : {}
 
 void FunctionDeclaration() : {}
 {
-	DataType() identifier() <LEFT_PAREN > (DataType() ExpressionOrSingleType()(<COMMA >)?)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+	DataType() identifier() <LEFT_PAREN > (DataType() Expression()(<COMMA >)?)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 
 void FunctionCall() : {}
 {
-	identifier() <LEFT_PAREN >(ExpressionOrSingleType() (<COMMA >)?)* < RIGHT_PAREN > <SEMICOLON >
+	identifier() <LEFT_PAREN >(Expression() (<COMMA >)?)* < RIGHT_PAREN > 
 }
 
 //statments such as (z++;, z*z;)
 void SimpleStatement() : {}
 {
-	ExpressionOrSingleType() < SEMICOLON >
+	Expression() < SEMICOLON >
 }
 
 
@@ -237,7 +237,7 @@ void IfStatment() : {}
 
 void If_Part() : {}
 {
-  < IF > <LEFT_PAREN > Conditions() < RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+  < IF > <LEFT_PAREN > Expression() < RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 
 void Else_Part() : {}
@@ -247,12 +247,12 @@ void Else_Part() : {}
 
 void whileLoop() : {}
 {
-  < WHILE > <LEFT_PAREN > Conditions() < RIGHT_PAREN > <LEFT_BRACKET> Statements() < RIGHT_BRACKET >
+  < WHILE > <LEFT_PAREN > Expression() < RIGHT_PAREN > <LEFT_BRACKET> Statements() < RIGHT_BRACKET >
 }
 
 void forLoop() : {}
 {
-	< FOR ><LEFT_PAREN > Assignment() Conditions()< SEMICOLON > forInc()< RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+	< FOR ><LEFT_PAREN > Assignment() Expression()< SEMICOLON > forInc()< RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 //need to add support for statments like i = i+1
 void forInc() : {}
@@ -262,15 +262,16 @@ void forInc() : {}
 
 void returnStatement() : {}
 {
-	< RETURN > ExpressionOrSingleType() < SEMICOLON >
+	< RETURN > Expression() < SEMICOLON >
 }
 
 
 //CONDITIONS eg ( a == 9, b <4  ect
-void Conditions() : {}
-{
-	ExpressionOrSingleType() booleanOperators() ExpressionOrSingleType()
-}
+//void Conditions() : {}
+//{
+
+//	Expression() (Operators() Expression())*
+//}
 
   
 
@@ -283,34 +284,24 @@ void DataType() : {}
 }
 
 
-void booleanOperators() : {Token t;}
+void Operators() : {Token t;}
 {
-	t = < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE >
+	t = < PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE >
 }
 
-void ExpressionOrSingleType() : {}
-{
-
-	LOOKAHEAD(2)
-	Expression() | assignmentType()
-}
 
 //types that can be assigned to a variable
 void assignmentType() : {}
 {
-  LOOKAHEAD(2)
-	 (< INTEGER > | < REAL > | identifier() | < CHARACTER >)(incOrDec())* |< STRING > 
+
+	 (LOOKAHEAD(2)FunctionCall()| < INTEGER > | < REAL > | identifier() | < CHARACTER >)(incOrDec())* | < STRING > 
 }
 
 void Expression() : {}
 {
-	assignmentType() (arethmeticOperators() assignmentType())*
+	assignmentType() (Operators() assignmentType())*
 }
 
-void arethmeticOperators() : {}
-{
-	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE >
-}
 
 void incOrDec() : {}
 {
