@@ -148,10 +148,12 @@ TOKEN : {
 }
 //numbers and char
 TOKEN : {
-<INTEGER: (<SIGN>)? (<DIGIT>)+ >
+< NUM : < INTEGER >  |< REAL > >
+| < INTEGER: (<SIGN>)? (<DIGIT>)+ >
  { debugStream.println("INTEGER TOKEN: " + matchedToken.image); }
 | <REAL:  (<SIGN>)? (<DIGIT>)+ "." | (<SIGN>)? "." (<DIGIT>)+ | (<SIGN>)? (<DIGIT>)+ "." (<DIGIT>)+ >
 { debugStream.println("REAL TOKEN: " + matchedToken.image); }
+
 | < CHARACTER : <SINGLEQUOTE> (~[]){1} <SINGLEQUOTE>>
 { debugStream.println("CHARACTER token: " + matchedToken.image); }
 | < STRING : <QUOTE> (~["\""])* <QUOTE>>
@@ -171,10 +173,10 @@ TOKEN : {
 // BCNF RULES
 
 //parser starts here
-SimpleNode Statements() #void: {}
+SimpleNode Statements(): {}
 {
 	(Statement())*
-	{return (SimpleNode) (jjtree.popNode());}
+	{return jjtThis;}
 }
 
 void Statement() #void :  {}
@@ -253,7 +255,7 @@ void IfStatment() : {}
 	If_Part() (Else_Part())?
 }
 
-void If_Part() #void : {}
+void If_Part() #void: {}
 {
   < IF > <LEFT_PAREN > Expression() < RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
@@ -293,12 +295,12 @@ void returnStatement() : {}
 
   
 
-void DataType() : {}
+void DataType() #void: {}
 {
-	< VOID >
-	| < INT >
-	| < DOUBLE >
-	| < CHAR >
+	< VOID > #VOID_TYPE
+	| < INT > #INT_TYPE
+	| < DOUBLE > #DOUBLE_TYPE
+	| < CHAR > #CHAR_TYPE
 }
 
 
@@ -312,8 +314,10 @@ void Operators() : {Token t;}
 void assignmentType() : {}
 {
 
-	 (LOOKAHEAD(2)FunctionCall()| < INTEGER > | < REAL > | identifier() | < CHARACTER >)(incOrDec())* | < STRING > 
+	(LOOKAHEAD(2)FunctionCall()| Number() | identifier() | Char())(incOrDec())* | String()
 }
+
+
 
 void Expression() : {}
 {
@@ -326,11 +330,39 @@ void incOrDec() #void: {}
 	< INC > | < DEC >
 }
 
-void identifier() : {Token t;}
+void identifier(): {Token t;}
 {
 	t = < IDENTIFIER >
 	{jjtThis.jjtSetValue(t);}
 }
+
+void Number() : {Token t;}
+{	t = < NUM >
+  { try
+	  {
+		jjtThis.jjtSetValue(Integer.valueOf(t.image));
+	  }
+	  catch(Exception e){} 
+	  finally
+	  {
+
+		jjtThis.jjtSetValue(Double.valueOf(t.image));
+	  }
+  }	
+
+}
+
+void Char() : {Token t;}
+{	t = < CHARACTER >
+	{jjtThis.jjtSetValue(t);}	
+}
+
+void String() : {Token t;}
+{	t = < STRING >
+	{jjtThis.jjtSetValue(t);}
+}
+
+
 
 
 
