@@ -171,13 +171,13 @@ TOKEN : {
 // BCNF RULES
 
 //parser starts here
-SimpleNode Statements() : {}
+SimpleNode Statements() #void: {}
 {
 	(Statement())*
-	{return jjtThis;}
+	{return (SimpleNode) (jjtree.popNode());}
 }
 
-void Statement() : {}
+void Statement() #void :  {}
 {
   	//looadhead 3 for distinguishing Assignments and function declorations.
 	LOOKAHEAD(3)
@@ -238,7 +238,7 @@ void FunctionCall() : {}
 	identifier() <LEFT_PAREN > paramaterList() < RIGHT_PAREN > 
 }
 
-void paramaterList() : {}{	(Expression() (<COMMA > Expression())*)*
+void paramaterList() #void : {}{	(Expression() (<COMMA > Expression())*)*
 }
 
 //statments such as (z++;, z*z;)
@@ -253,12 +253,12 @@ void IfStatment() : {}
 	If_Part() (Else_Part())?
 }
 
-void If_Part() : {}
+void If_Part() #void : {}
 {
   < IF > <LEFT_PAREN > Expression() < RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 
-void Else_Part() : {}
+void Else_Part() #void: {}
 {
   < ELSE > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
@@ -273,7 +273,7 @@ void forLoop() : {}
 	< FOR ><LEFT_PAREN > variableDeclaration() Expression()< SEMICOLON > forInc()< RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 //need to add support for statments like i = i+1
-void forInc() : {}
+void forInc() #void : {}
 {
 	identifier() (incOrDec())
 }
@@ -321,7 +321,7 @@ void Expression() : {}
 }
 
 
-void incOrDec() : {}
+void incOrDec() #void: {}
 {
 	< INC > | < DEC >
 }
