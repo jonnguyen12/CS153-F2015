@@ -12,6 +12,7 @@ import wci.intermediate.ICodeNodeType;
  */
 public enum ICodeNodeTypeImpl implements ICodeNodeType
 {
+
     // Program structure
     PROGRAM, PROCEDURE, FUNCTION,
 
@@ -31,8 +32,5 @@ public enum ICodeNodeTypeImpl implements ICodeNodeType
     // Operands
     VARIABLE, SUBSCRIPTS, FIELD,
     INTEGER_CONSTANT, REAL_CONSTANT,
-    STRING_CONSTANT, BOOLEAN_CONSTANT,
-
-    // WRITE parameter
-    WRITE_PARM,
+    STRING_CONSTANT, BOOLEAN_CONSTANT
 }

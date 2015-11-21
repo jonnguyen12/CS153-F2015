@@ -22,13 +22,4 @@ public class TypeFactory
         return new TypeSpecImpl(form);
     }
 
-    /**
-     * Create a string type specification.
-     * @param value the string value.
-     * @return the type specification.
-     */
-    public static TypeSpec createStringType(String value)
-    {
-        return new TypeSpecImpl(value);
-    }
 }

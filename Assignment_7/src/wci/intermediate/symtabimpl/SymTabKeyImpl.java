@@ -16,9 +16,9 @@ public enum SymTabKeyImpl implements SymTabKey
     CONSTANT_VALUE,
 
     // Procedure or function.
-    ROUTINE_CODE, ROUTINE_SYMTAB, ROUTINE_ICODE,
-    ROUTINE_PARMS, ROUTINE_ROUTINES,
+    FUNCTION_CODE, FUNCTION_SYMTAB, FUNCTION_ICODE,
+    FUNCTION_PARMS, FUNCTION_FUNCTIONS,
 
     // Variable or record field value.
-    DATA_VALUE
+    VARIABLE_VALUE
 }

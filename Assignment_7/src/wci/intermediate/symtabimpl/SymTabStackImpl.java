@@ -30,7 +30,7 @@ public class SymTabStackImpl
 
     /**
      * Setter.
-     * @param entry the symbol table entry for the main program identifier.
+     * @param id the symbol table entry for the main program identifier.
      */
     public void setProgramId(SymTabEntry id)
     {
