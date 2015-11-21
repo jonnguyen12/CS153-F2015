@@ -336,7 +336,7 @@ void Operators() : {Token t;}
 void assignmentType() : {}
 {
 
-	(LOOKAHEAD(2)FunctionCall()| Number() | identifier() | Char())(incOrDec())* | String()
+	(LOOKAHEAD(2)FunctionCall()| Number() | identifier() | Char())incOrDec() | String()
 }
 
 
@@ -349,7 +349,7 @@ void Expression() : {}
 
 void incOrDec() #void: {}
 {
-	< INC > | < DEC >
+	(< INC > | < DEC >)?
 }
 
 void identifier(): {Token t;}
