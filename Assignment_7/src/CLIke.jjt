@@ -41,8 +41,13 @@ TOKEN_MGR_DECLS : {
         SimpleCharStream scs = new SimpleCharStream(sr);
         CLikeParserTokenManager mgr = new CLikeParserTokenManager(scs);
 
+
 		while (mgr.getNextToken().kind != EOF) {}
+
     }
+
+
+    
 }
 
 
@@ -171,6 +176,9 @@ TOKEN : {
 //error token
 TOKEN : {	< ERROR: ~["\r", "\n"] >
 }
+
+TOKEN : {
+  < #EOL : "\r" | "\n" | "\r\n" >}
     
 
 
@@ -178,13 +186,12 @@ TOKEN : {	< ERROR: ~["\r", "\n"] >
 
 //parser starts here
 SimpleNode Program() : {}
-{	(try		{			Statements()
-			| Error() {handleError(token); }	 
+{	try		{			Statements() | Error() {handleError(token); }	 
 		}
 		catch (ParseException ex) {
 			handleError(ex.currentToken);
 		}
-	)
+
 	{return jjtThis;}	
 }
 
@@ -386,8 +393,9 @@ void Error() : {}
 JAVACODE
 String handleError(Token token) {
 	System.err.println("ERROR ON LINE #" + token.beginLine + "    " + "Trouble token:  " + token.image + "\n");
-	Token nextGoodToken = getNextToken();
-	return nextGoodToken.image;
+	Token nextToken = getNextToken();
+
+	return nextToken.image;
 }
 
 
