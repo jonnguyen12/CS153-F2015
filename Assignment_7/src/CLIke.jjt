@@ -20,7 +20,7 @@ public class CLikeParser
         java.io.StringReader sr = new java.io.StringReader(content);
         CLikeParser parser = new CLikeParser(sr);
         try {
-            SimpleNode root = parser.Statements();
+            SimpleNode root = parser.Program();
             System.out.println("=====PRINTING PARSE TREE=====");
             root.dump(">");
             System.out.println("=====ENDING PARSE TREE=====");            
@@ -167,16 +167,31 @@ TOKEN : {
 | < #SIGN : "-" | "+" >
 
 }
+
+//error token
+TOKEN : {	< ERROR: ~["\r", "\n"] >
+}
     
 
 
 // BCNF RULES
 
 //parser starts here
-SimpleNode Statements(): {}
+SimpleNode Program() : {}
+{	(try		{			Statements()
+			| Error() {handleError(token); }	 
+		}
+		catch (ParseException ex) {
+			handleError(ex.currentToken);
+		}
+	)
+	{return jjtThis;}	
+}
+
+
+void Statements(): {}
 {
-	(Statement())*
-	{return jjtThis;}
+	(Statement())+
 }
 
 void Statement() #void :  {}
@@ -360,6 +375,19 @@ void Char() : {Token t;}
 void String() : {Token t;}
 {	t = < STRING >
 	{jjtThis.jjtSetValue(t);}
+}
+
+
+void Error() : {}
+{
+	< ERROR >}
+
+
+JAVACODE
+String handleError(Token token) {
+	System.err.println("ERROR ON LINE #" + token.beginLine + "    " + "Trouble token:  " + token.image + "\n");
+	Token nextGoodToken = getNextToken();
+	return nextGoodToken.image;
 }
 
 
