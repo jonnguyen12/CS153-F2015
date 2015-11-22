@@ -131,7 +131,9 @@ TOKEN : {
    	| <FOR : "for">
  	{ debugStream.println("FOR token: " + matchedToken.image); }
    	| <DEFINE : "define">
- 	{ debugStream.println("DEFINE token: " + matchedToken.image); }	  	 		
+ 	{ debugStream.println("DEFINE token: " + matchedToken.image); }
+   	| <END : "end">
+ 	{ debugStream.println("END token: " + matchedToken.image); }	  	 	  	 		
 
 }
 //Special Symbols
@@ -322,7 +324,7 @@ void variableDeclaration() : {ArrayList<SymTabEntry> variableList;
             }
         )*
         <COLON>
-        <IDENTIFIER> {
+        < IDENTIFIER > {
             SymTabEntry typeId = symTabStack.lookup(token.image);
             typeId.appendLineNumber(token.beginLine);
             TypeSpec type = typeId.getTypeSpec();
@@ -333,6 +335,7 @@ void variableDeclaration() : {ArrayList<SymTabEntry> variableList;
         }
         <SEMICOLON>
     )+
+    < END >
 }
 
 
@@ -382,7 +385,7 @@ void whileLoop() : {}
 
 void forLoop() : {}
 {
-	< FOR ><LEFT_PAREN > variableDeclaration() Expression()< SEMICOLON > forInc()< RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+	< FOR ><LEFT_PAREN >  Expression()< SEMICOLON > forInc()< RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 //need to add support for statments like i = i+1
 void forInc() #void : {}
@@ -419,7 +422,7 @@ void DataType() #void: {}
 
 void Operators() : {}
 {
-	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE > | < AND > | < OR >
+	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE > | < AND > | < OR > | < EQUAL >
 }
 
 
