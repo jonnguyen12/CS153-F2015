@@ -5,7 +5,7 @@ package wci.intermediate;
  *
  * <p>The interface for a type specification.</p>
  *
- * <p>Copyright (c) 2009 by Ronald Mak</p>
+ * <p>Copyright (c) 2008 by Ronald Mak</p>
  * <p>For instructional purposes only.  No warranties.</p>
  */
 public interface TypeSpec
@@ -43,9 +43,12 @@ public interface TypeSpec
     public Object getAttribute(TypeKey key);
 
     /**
+     * @return true if this is a Pascal string type.
+     */
+    public boolean isPascalString();
+
+    /**
      * @return the base type of this type.
      */
     public TypeSpec baseType();
-
-
 }

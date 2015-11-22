@@ -6,6 +6,7 @@ import wci.intermediate.*;
 import wci.intermediate.symtabimpl.Predefined;
 
 import static wci.intermediate.typeimpl.TypeFormImpl.ARRAY;
+import static wci.intermediate.typeimpl.TypeFormImpl.SUBRANGE;
 import static wci.intermediate.typeimpl.TypeKeyImpl.*;
 
 /**
@@ -13,7 +14,7 @@ import static wci.intermediate.typeimpl.TypeKeyImpl.*;
  *
  * <p>A Pascal type specification implementation.</p>
  *
- * <p>Copyright (c) 2009 by Ronald Mak</p>
+ * <p>Copyright (c) 2008 by Ronald Mak</p>
  * <p>For instructional purposes only.  No warranties.</p>
  */
 public class TypeSpecImpl
@@ -33,6 +34,23 @@ public class TypeSpecImpl
         this.identifier = null;
     }
 
+    /**
+     * Constructor.
+     * @param value a string value.
+     */
+    public TypeSpecImpl(String value)
+    {
+        this.form = ARRAY;
+
+        TypeSpec indexType = new TypeSpecImpl(SUBRANGE);
+        indexType.setAttribute(SUBRANGE_BASE_TYPE, Predefined.numberType);
+        indexType.setAttribute(SUBRANGE_MIN_VALUE, 1);
+        indexType.setAttribute(SUBRANGE_MAX_VALUE, value.length());
+
+        setAttribute(ARRAY_INDEX_TYPE, indexType);
+        setAttribute(ARRAY_ELEMENT_TYPE, Predefined.charType);
+        setAttribute(ARRAY_ELEMENT_COUNT, value.length());
+    }
 
     /**
      * Getter
@@ -81,19 +99,29 @@ public class TypeSpecImpl
         return this.get(key);
     }
 
+    /**
+     * @return true if this is a Pascal string type.
+     */
+    public boolean isPascalString()
+    {
+        if (form == ARRAY) {
+            TypeSpec elmtType  = (TypeSpec) getAttribute(ARRAY_ELEMENT_TYPE);
+            TypeSpec indexType = (TypeSpec) getAttribute(ARRAY_INDEX_TYPE);
+
+            return (elmtType.baseType()  == Predefined.charType) &&
+                   (indexType.baseType() == Predefined.numberType);
+        }
+        else {
+            return false;
+        }
+    }
 
     /**
      * @return the base type of this type.
      */
     public TypeSpec baseType()
     {
-        TypeSpec baseTypeSpec;
-        if (form == ARRAY) {
-            baseTypeSpec = (TypeSpec) getAttribute(ARRAY_ELEMENT_TYPE);
-        }
-        else {
-            baseTypeSpec = this;
-        }
-        return baseTypeSpec;
+        return form == SUBRANGE ? (TypeSpec) getAttribute(SUBRANGE_BASE_TYPE)
+                                : this;
     }
 }

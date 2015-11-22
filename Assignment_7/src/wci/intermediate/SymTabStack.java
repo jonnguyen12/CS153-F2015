@@ -7,7 +7,7 @@ import java.util.ArrayList;
  *
  * <p>The interface for the symbol table stack.</p>
  *
- * <p>Copyright (c) 2009 by Ronald Mak</p>
+ * <p>Copyright (c) 2008 by Ronald Mak</p>
  * <p>For instructional purposes only.  No warranties.</p>
  */
 public interface SymTabStack
@@ -51,7 +51,7 @@ public interface SymTabStack
 
     /**
      * Pop a symbol table off the stack.
-     * @return the popped symbol table.
+     * @return the popped symbol table structure.
      */
     public SymTab pop();
 

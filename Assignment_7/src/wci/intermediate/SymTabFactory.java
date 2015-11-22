@@ -7,7 +7,7 @@ import wci.intermediate.symtabimpl.*;
  *
  * <p>A factory for creating objects that implement the symbol table.</p>
  *
- * <p>Copyright (c) 2009 by Ronald Mak</p>
+ * <p>Copyright (c) 2008 by Ronald Mak</p>
  * <p>For instructional purposes only.  No warranties.</p>
  */
 public class SymTabFactory

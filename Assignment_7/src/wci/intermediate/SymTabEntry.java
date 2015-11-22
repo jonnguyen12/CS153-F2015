@@ -7,7 +7,7 @@ import java.util.ArrayList;
  *
  * <p>The interface for a symbol table entry.</p>
  *
- * <p>Copyright (c) 2009 by Ronald Mak</p>
+ * <p>Copyright (c) 2008 by Ronald Mak</p>
  * <p>For instructional purposes only.  No warranties.</p>
  */
 public interface SymTabEntry
@@ -23,6 +23,18 @@ public interface SymTabEntry
      * @return the symbol table that contains this entry.
      */
     public SymTab getSymTab();
+    
+    /**
+     * Setter. 
+     * @param index the local variable array index.
+     */
+    public void setIndex(int index);
+    
+    /**
+     * Getter.
+     * @return the local variable index.
+     */
+    public int getIndex();
 
     /**
      * Setter.

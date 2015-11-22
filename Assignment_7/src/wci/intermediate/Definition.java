@@ -5,14 +5,14 @@ package wci.intermediate;
  *
  * <p>The interface for how a symbol table entry is defined.</p>
  *
- * <p>Copyright (c) 2009 by Ronald Mak</p>
+ * <p>Copyright (c) 2008 by Ronald Mak</p>
  * <p>For instructional purposes only.  No warranties.</p>
  */
 public interface Definition
 {
     /**
      * Getter.
-     * @return the text of the definition.
+     * @return String the text of the definition.
      */
     public String getText();
 }

@@ -10,7 +10,7 @@ import wci.intermediate.*;
  *
  * <p>An implementation of a symbol table entry.</p>
  *
- * <p>Copyright (c) 2009 by Ronald Mak</p>
+ * <p>Copyright (c) 2008 by Ronald Mak</p>
  * <p>For instructional purposes only.  No warranties.</p>
  */
 public class SymTabEntryImpl
@@ -19,6 +19,7 @@ public class SymTabEntryImpl
 {
     private String name;                     // entry name
     private SymTab symTab;                   // parent symbol table
+    private int index;                       // local variable array index
     private Definition definition;           // how the identifier is defined
     private TypeSpec typeSpec;               // type specification
     private ArrayList<Integer> lineNumbers;  // source line numbers
@@ -51,6 +52,24 @@ public class SymTabEntryImpl
     public SymTab getSymTab()
     {
         return symTab;
+    }
+    
+    /**
+     * Setter. 
+     * @param index the local variable array index.
+     */
+    public void setIndex(int index)
+    {
+        this.index = index;
+    }
+    
+    /**
+     * Getter.
+     * @return the local variable index.
+     */
+    public int getIndex()
+    {
+        return index;
     }
 
     /**

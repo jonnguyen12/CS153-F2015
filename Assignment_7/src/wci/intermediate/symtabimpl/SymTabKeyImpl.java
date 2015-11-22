@@ -7,7 +7,7 @@ import wci.intermediate.SymTabKey;
  *
  * <p>Attribute keys for a symbol table entry.</p>
  *
- * <p>Copyright (c) 2009 by Ronald Mak</p>
+ * <p>Copyright (c) 2008 by Ronald Mak</p>
  * <p>For instructional purposes only.  No warranties.</p>
  */
 public enum SymTabKeyImpl implements SymTabKey
@@ -16,9 +16,9 @@ public enum SymTabKeyImpl implements SymTabKey
     CONSTANT_VALUE,
 
     // Procedure or function.
-    FUNCTION_CODE, FUNCTION_SYMTAB, FUNCTION_ICODE,
-    FUNCTION_PARMS, FUNCTION_FUNCTIONS,
+    ROUTINE_CODE, ROUTINE_SYMTAB, ROUTINE_ICODE,
+    ROUTINE_PARMS, ROUTINE_ROUTINES, ROUTINE_LOCALS_COUNT,
 
     // Variable or record field value.
-    VARIABLE_VALUE
+    DATA_VALUE
 }

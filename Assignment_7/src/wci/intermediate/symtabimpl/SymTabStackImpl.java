@@ -9,7 +9,7 @@ import wci.intermediate.*;
  *
  * <p>An implementation of the symbol table stack.</p>
  *
- * <p>Copyright (c) 2009 by Ronald Mak</p>
+ * <p>Copyright (c) 2008 by Ronald Mak</p>
  * <p>For instructional purposes only.  No warranties.</p>
  */
 public class SymTabStackImpl
@@ -30,7 +30,7 @@ public class SymTabStackImpl
 
     /**
      * Setter.
-     * @param id the symbol table entry for the main program identifier.
+     * @param entry the symbol table entry for the main program identifier.
      */
     public void setProgramId(SymTabEntry id)
     {

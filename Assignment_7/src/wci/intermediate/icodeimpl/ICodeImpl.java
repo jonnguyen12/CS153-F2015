@@ -1,26 +1,26 @@
 package wci.intermediate.icodeimpl;
 
-import wci.intermediate.ICode;
-import wci.intermediate.ICodeNode;
+import wci.frontend.Node;
+import wci.intermediate.*;
 
 /**
  * <h1>ICodeImpl</h1>
  *
  * <p>An implementation of the intermediate code as a parse tree.</p>
  *
- * <p>Copyright (c) 2009 by Ronald Mak</p>
+ * <p>Copyright (c) 2008 by Ronald Mak</p>
  * <p>For instructional purposes only.  No warranties.</p>
  */
 public class ICodeImpl implements ICode
 {
-    private ICodeNode root;  // root node
+    private Node root;  // root node
 
     /**
      * Set and return the root node.
      * @param node the node to set as root.
      * @return the root node.
      */
-    public ICodeNode setRoot(ICodeNode node)
+    public Node setRoot(Node node)
     {
         root = node;
         return root;
@@ -30,7 +30,7 @@ public class ICodeImpl implements ICode
      * Get the root node.
      * @return the root node.
      */
-    public ICodeNode getRoot()
+    public Node getRoot()
     {
         return root;
     }

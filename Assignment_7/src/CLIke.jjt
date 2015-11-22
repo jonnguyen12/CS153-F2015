@@ -1,21 +1,63 @@
 options {
     BUILD_PARSER=true;
+    JJTREE_OUTPUT_DIRECTORY="wci/frontend";
+    NODE_EXTENDS = "wci.intermediate.icodeimpl.ICodeNodeImpl";
+    MULTI=true;
+    VISITOR=true;
+    //DEBUG_PARSER=true;
 
 
 }
 PARSER_BEGIN(CLikeParser)
+package wci.frontend;
+
+import java.util.ArrayList;
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
+import wci.intermediate.*;
+import wci.intermediate.symtabimpl.*;
+import wci.backend.*;
+import wci.util.*;
+
+import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
+import static wci.intermediate.symtabimpl.DefinitionImpl.*;
+import static wci.intermediate.symtabimpl.RoutineCodeImpl.*;
+import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
+import static wci.intermediate.icodeimpl.ICodeKeyImpl.*;
 
 
 public class CLikeParser
 {
-    public static void main(String [] args) throws IOException
+  	private static SymTabStack symTabStack;
+  	private static SymTabEntry programId;
+  	
+    public static void main(String [] args) throws Exception
     {
-      	byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
+
+      	//create symbol table
+      	symTabStack = SymTabFactory.createSymTabStack();
+      	Predefined.initialize(symTabStack);
+
+      	String sourceFilePath = args[0];
+      	
+		//parse the program
+		Reader reader = new FileReader(sourceFilePath);
+		CLikeParser parser = new CLikeParser(reader);
+		SimpleNode rootNode = parser.Program();
+		rootNode.dump(">");
+
+		//Print cross reference
+		CrossReferencer crossReferencer = new CrossReferencer();
+		crossReferencer.print(symTabStack);
+
+		//print parse tree
+		//ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
+        //treePrinter.print(symTabStack);
+
+
+		
+      	
+      	/*byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
 	  	String content = new String(encoded, StandardCharsets.UTF_8);
         java.io.StringReader sr = new java.io.StringReader(content);
         CLikeParser parser = new CLikeParser(sr);
@@ -28,10 +70,11 @@ public class CLikeParser
         catch (ParseException ex) {
             ex.printStackTrace();
         }
+        */
     }		
 }
 PARSER_END(CLikeParser)
-
+/*
 TOKEN_MGR_DECLS : {
     public static void main(String [] args) throws IOException
     {
@@ -49,7 +92,7 @@ TOKEN_MGR_DECLS : {
 
     
 }
-
+*/
 
 SKIP : {
    <IGNORE : [" ", "\r", "\n", "\t"]>
@@ -174,11 +217,11 @@ TOKEN : {
 }
 
 //error token
-TOKEN : {	< ERROR: ~["\r", "\n"] >
+TOKEN : {
+	< ERROR: ~["\r", "\n"] >
 }
 
-TOKEN : {
-  < #EOL : "\r" | "\n" | "\r\n" >}
+
     
 
 
@@ -186,13 +229,22 @@ TOKEN : {
 
 //parser starts here
 SimpleNode Program() : {}
-{	try		{			Statements() | Error() {handleError(token); }	 
-		}
-		catch (ParseException ex) {
-			handleError(ex.currentToken);
-		}
-
-	{return jjtThis;}	
+{
+	{
+		programId = symTabStack.enterLocal("CLike");
+		programId.setDefinition(DefinitionImpl.PROGRAM);
+		programId.setAttribute(ROUTINE_SYMTAB, symTabStack.push());
+		symTabStack.setProgramId(programId);
+	}
+	try {
+		Statements()
+		(< EOF >)? {return jjtThis;}
+		 
+	}
+	catch (ParseException ex) {
+		handleError(ex);
+		return null;
+	}
 }
 
 
@@ -231,22 +283,44 @@ void Statement() #void :  {}
       {System.out.println("=END RETURN STATEMENT=");}
     | {System.out.println("=PARSING FOR LOOP=");}
       forLoop()
-      {System.out.println("=END FOR LOOP=");}      
+      {System.out.println("=END FOR LOOP=");}
+
 	
 }
 
-void Assignment() : {}
+SimpleNode Assignment() : {}
 {
   	//assignment statments eg (i = 0, i; or ;)
-	identifier() (<EQUAL>	Expression())? <SEMICOLON >
+	identifier()
+	{
+		//SymTabEntry variableId = symTabStack.lookup(token.image);
+        //variableId.appendLineNumber(token.beginLine);
+	} (<EQUAL>	Expression())? <SEMICOLON >
+
+	{return jjtThis;}
 
 }
 
-void variableDeclaration() : {}
+void variableDeclaration() : {SymTabEntry someID;}
 {
   	//assignment statments eg (int i = 0.i = 0, i; or ;)
-	DataType() identifier() (<EQUAL>	Expression())? <SEMICOLON >
+	DataType() {
+	  //someID = symTabStack.enterLocal(token.image);		  
+	  //SymTabEntry typeId = symTabStack.lookup(token.image);
+      //typeId.appendLineNumber(token.beginLine);
+      //TypeSpec type = typeId.getTypeSpec();
+      //someID.setTypeSpec(type);
+	}
 
+	   < IDENTIFIER >
+	{
+	  symTabStack.enterLocal(token.image);
+	  someID = symTabStack.enterLocal(token.image);		
+	  processVariableDecl(token, someID);
+	}
+
+	
+	(<EQUAL> Expression())? <SEMICOLON >
 }
 
 
@@ -262,7 +336,9 @@ void FunctionCall() : {}
 	identifier() <LEFT_PAREN > paramaterList() < RIGHT_PAREN > 
 }
 
-void paramaterList() #void : {}{	(Expression() (<COMMA > Expression())*)*
+void paramaterList() #void : {}
+{
+	(Expression() (<COMMA > Expression())*)*
 }
 
 //statments such as (z++;, z*z;)
@@ -319,16 +395,19 @@ void returnStatement() : {}
 
 void DataType() #void: {}
 {
-	< VOID > #VOID_TYPE
-	| < INT > #INT_TYPE
-	| < DOUBLE > #DOUBLE_TYPE
-	| < CHAR > #CHAR_TYPE
+	
+	  < VOID >
+	| < INT > 
+	| < DOUBLE > 
+	| < CHAR > 
+	
+
 }
 
 
-void Operators() : {Token t;}
+void Operators() : {}
 {
-	t = < PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE > | < AND > | < OR >
+	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE > | < AND > | < OR >
 }
 
 
@@ -352,50 +431,77 @@ void incOrDec() #void: {}
 	(< INC > | < DEC >)?
 }
 
-void identifier(): {Token t;}
+void identifier(): {}
 {
-	t = < IDENTIFIER >
-	{jjtThis.jjtSetValue(t);}
+	< IDENTIFIER >
+	{
+		SymTabEntry variableId = symTabStack.lookup(token.image);
+		variableId.appendLineNumber(token.beginLine);
+		TypeSpec type = variableId.getTypeSpec();
+		jjtThis.setTypeSpec(type);
+		jjtThis.setAttribute(ID, variableId); 
+    }
 }
 
-void Number() : {Token t;}
-{	t = < NUM >
+void Number() : {}
+{
+	< NUM >
   { try
 	  {
-		jjtThis.jjtSetValue(Integer.valueOf(t.image));
+		jjtThis.setTypeSpec(Predefined.numberType);
+      	jjtThis.setAttribute(VALUE, Integer.parseInt(token.image));
 	  }
-	  catch(Exception e){} 
-	  finally
-	  {
-
-		jjtThis.jjtSetValue(Double.valueOf(t.image));
-	  }
+	  catch(Exception e){
+	  	try
+	  	{
+			jjtThis.setAttribute(VALUE, Float.parseFloat(token.image));
+	  	}
+	  	catch(Exception e2)
+	  	{
+			//error end of line
+	  	}
+	  } 
+	  
+	  
   }	
 
 }
 
-void Char() : {Token t;}
-{	t = < CHARACTER >
-	{jjtThis.jjtSetValue(t);}	
-}
-
-void String() : {Token t;}
-{	t = < STRING >
-	{jjtThis.jjtSetValue(t);}
-}
-
-
-void Error() : {}
+void Char() : {}
 {
-	< ERROR >}
+	< CHARACTER >
+}
+
+void String() : {}
+{
+	< STRING >
+	{
+		jjtThis.setTypeSpec(Predefined.charType);
+		jjtThis.setAttribute(VALUE, new String(token.image));
+	}
+}
 
 
 JAVACODE
-String handleError(Token token) {
-	System.err.println("ERROR ON LINE #" + token.beginLine + "    " + "Trouble token:  " + token.image + "\n");
-	Token nextToken = getNextToken();
+//return the token name in string format
+void processVariableDecl(Token token, SymTabEntry variableId) #void
+{
+    variableId.setDefinition(DefinitionImpl.VARIABLE);
+    variableId.appendLineNumber(token.beginLine);
+}
 
-	return nextToken.image;
+
+JAVACODE
+String handleError(ParseException ex) {
+    Token token = ex.currentToken;
+    System.out.println(ex.getMessage());
+
+    do {
+    	token = getNextToken();
+    } while (token.kind != SEMICOLON);
+
+	jjtree.popNode();
+    return token.image;
 }
 
 

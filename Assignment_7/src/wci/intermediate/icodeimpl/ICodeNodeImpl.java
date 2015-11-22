@@ -24,6 +24,12 @@ public class ICodeNodeImpl
     private ICodeNode parent;               // parent node
     private ArrayList<ICodeNode> children;  // children array list
     private TypeSpec typeSpec;              // data type specification
+    
+    /**
+     * Constructor.
+     * @param type the node type whose name will be the name of this node.
+     */
+    public ICodeNodeImpl() {}
 
     /**
      * Constructor.
@@ -56,7 +62,7 @@ public class ICodeNodeImpl
 
     /**
      * Set the type specification of this node.
-     * @param typeSpec the type specification to set.
+     * @param typeSpec the type sprcification to set.
      */
     public void setTypeSpec(TypeSpec typeSpec)
     {

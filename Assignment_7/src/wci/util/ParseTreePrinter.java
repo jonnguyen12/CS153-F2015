@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.io.PrintStream;
 
+import wci.frontend.*;
 import wci.intermediate.*;
-import wci.intermediate.icodeimpl.*;
 
 import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
 import static wci.intermediate.symtabimpl.DefinitionImpl.*;
@@ -17,7 +17,7 @@ import static wci.intermediate.symtabimpl.DefinitionImpl.*;
  *
  * <p>Print a parse tree.</p>
  *
- * <p>Copyright (c) 2009 by Ronald Mak</p>
+ * <p>Copyright (c) 2008 by Ronald Mak</p>
  * <p>For instructional purposes only.  No warranties.</p>
  */
 public class ParseTreePrinter
@@ -51,18 +51,6 @@ public class ParseTreePrinter
 
     /**
      * Print the intermediate code as a parse tree.
-     * @param iCode the intermediate code.
-     */
-    public void print(ICode iCode)
-    {
-        ps.println("\n===== INTERMEDIATE CODE =====\n");
-
-        printNode((ICodeNodeImpl) iCode.getRoot());
-        printLine();
-    }
-
-    /**
-     * Print the intermediate code as a parse tree.
      * @param symTabStack the symbol table stack.
      */
     public void print(SymTabStack symTabStack)
@@ -84,11 +72,11 @@ public class ParseTreePrinter
                            " " + routineId.getName() + " ***\n");
 
         // Print the intermediate code in the routine's symbol table entry.
-        ICode iCode = (ICode) routineId.getAttribute(FUNCTION_ICODE);
+        ICode iCode = (ICode) routineId.getAttribute(ROUTINE_ICODE);
         if (iCode.getRoot() != null) {
-            printNode((ICodeNodeImpl) iCode.getRoot());
+            printNode((SimpleNode) iCode.getRoot());
         }
-/*
+
         // Print any procedures and functions defined in the routine.
         ArrayList<SymTabEntry> routineIds =
             (ArrayList<SymTabEntry>) routineId.getAttribute(ROUTINE_ROUTINES);
@@ -96,14 +84,14 @@ public class ParseTreePrinter
             for (SymTabEntry rtnId : routineIds) {
                 printRoutine(rtnId);
             }
-        }*/
+        }
     }
 
     /**
      * Print a parse tree node.
      * @param node the parse tree node.
      */
-    private void printNode(ICodeNodeImpl node)
+    private void printNode(SimpleNode node)
     {
         // Opening tag.
         append(indentation); append("<" + node.toString());
@@ -111,14 +99,12 @@ public class ParseTreePrinter
         printAttributes(node);
         printTypeSpec(node);
 
-        ArrayList<ICodeNode> childNodes = node.getChildren();
-
         // Print the node's children followed by the closing tag.
-        if ((childNodes != null) && (childNodes.size() > 0)) {
+        if (node.jjtGetNumChildren() > 0) {
             append(">");
             printLine();
 
-            printChildNodes(childNodes);
+            printChildNodes(node);
             append(indentation); append("</" + node.toString() + ">");
         }
 
@@ -134,7 +120,7 @@ public class ParseTreePrinter
      * Print a parse tree node's attributes.
      * @param node the parse tree node.
      */
-    private void printAttributes(ICodeNodeImpl node)
+    private void printAttributes(SimpleNode node)
     {
         String saveIndentation = indentation;
         indentation += indent;
@@ -167,24 +153,27 @@ public class ParseTreePrinter
         String text = keyString.toLowerCase() + "=\"" + valueString + "\"";
         append(" "); append(text);
 
-        // Include an identifier's nesting level.
+        // Include an identifier's nesting level and local variable index.
         if (isSymTabEntry) {
             int level = ((SymTabEntry) value).getSymTab().getNestingLevel();
+            int index = ((SymTabEntry) value).getIndex();
             printAttribute("LEVEL", level);
+            printAttribute("INDEX", index);
         }
     }
 
     /**
      * Print a parse tree node's child nodes.
-     * @param childNodes the array list of child nodes.
+     * @param node the node whose children to print.
      */
-    private void printChildNodes(ArrayList<ICodeNode> childNodes)
+    private void printChildNodes(SimpleNode node)
     {
         String saveIndentation = indentation;
         indentation += indent;
 
-        for (ICodeNode child : childNodes) {
-            printNode((ICodeNodeImpl) child);
+        int count = node.jjtGetNumChildren();
+        for (int i = 0; i < count; ++i) {
+            printNode((SimpleNode)node.jjtGetChild(i));
         }
 
         indentation = saveIndentation;
@@ -194,7 +183,7 @@ public class ParseTreePrinter
      * Print a parse tree node's type specification.
      * @param node the parse tree node.
      */
-    private void printTypeSpec(ICodeNodeImpl node)
+    private void printTypeSpec(SimpleNode node)
     {
         TypeSpec typeSpec = node.getTypeSpec();
 
