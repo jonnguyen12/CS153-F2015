@@ -129,7 +129,9 @@ TOKEN : {
   	| <RETURN : "return">
  	{ debugStream.println("RETURN token: " + matchedToken.image); }
    	| <FOR : "for">
- 	{ debugStream.println("FOR token: " + matchedToken.image); }	 		
+ 	{ debugStream.println("FOR token: " + matchedToken.image); }
+   	| <DEFINE : "define">
+ 	{ debugStream.println("DEFINE token: " + matchedToken.image); }	  	 		
 
 }
 //Special Symbols
@@ -182,6 +184,8 @@ TOKEN : {
 { debugStream.println("COMMA token: " + matchedToken.image); }
 | < QUOTE: "\"" >
 { debugStream.println("QUOTE token: " + matchedToken.image); }
+| < COLON: ":" >
+{ debugStream.println("COLON token: " + matchedToken.image); }
 }
 
   
@@ -250,7 +254,8 @@ SimpleNode Program() : {}
 
 void Statements(): {}
 {
-	(Statement())+
+    
+	(Statement())*
 }
 
 void Statement() #void :  {}
@@ -260,7 +265,7 @@ void Statement() #void :  {}
 	{System.out.println("=PARSING ASSIGNMENT=");}
 	Assignment()
 	{System.out.println("=END ASSIGNMENT=");}
-	|LOOKAHEAD(3){System.out.println("=PARSING VARIABLE DECLARATION=");}
+	|{System.out.println("=PARSING VARIABLE DECLARATION=");}
     variableDeclaration()
     {System.out.println("=END VARIABLE DECLARATION=");}	
 	|LOOKAHEAD(2){System.out.println("=PARSING SIMPLE STATEMENT=");}
@@ -301,26 +306,33 @@ SimpleNode Assignment() : {}
 
 }
 
-void variableDeclaration() : {SymTabEntry someID;}
+void variableDeclaration() : {ArrayList<SymTabEntry> variableList;
+	                                 int index = 0;}
 {
-  	//assignment statments eg (int i = 0.i = 0, i; or ;)
-	DataType() {
-	  //someID = symTabStack.enterLocal(token.image);		  
-	  //SymTabEntry typeId = symTabStack.lookup(token.image);
-      //typeId.appendLineNumber(token.beginLine);
-      //TypeSpec type = typeId.getTypeSpec();
-      //someID.setTypeSpec(type);
-	}
+    <DEFINE>
+    (
+        <IDENTIFIER> {
+            variableList = new ArrayList<SymTabEntry>();
+            processVariableDecl(token, index++, variableList);
+        }
+        (
+            <COMMA>
+            <IDENTIFIER> {
+                processVariableDecl(token, index++, variableList);
+            }
+        )*
+        <COLON>
+        <IDENTIFIER> {
+            SymTabEntry typeId = symTabStack.lookup(token.image);
+            typeId.appendLineNumber(token.beginLine);
+            TypeSpec type = typeId.getTypeSpec();
 
-	   < IDENTIFIER >
-	{
-	  symTabStack.enterLocal(token.image);
-	  someID = symTabStack.enterLocal(token.image);		
-	  processVariableDecl(token, someID);
-	}
-
-	
-	(<EQUAL> Expression())? <SEMICOLON >
+            for (SymTabEntry variableId : variableList) {
+                variableId.setTypeSpec(type);
+            }
+        }
+        <SEMICOLON>
+    )+
 }
 
 
@@ -434,13 +446,7 @@ void incOrDec() #void: {}
 void identifier(): {}
 {
 	< IDENTIFIER >
-	{
-		SymTabEntry variableId = symTabStack.lookup(token.image);
-		variableId.appendLineNumber(token.beginLine);
-		TypeSpec type = variableId.getTypeSpec();
-		jjtThis.setTypeSpec(type);
-		jjtThis.setAttribute(ID, variableId); 
-    }
+
 }
 
 void Number() : {}
@@ -448,7 +454,7 @@ void Number() : {}
 	< NUM >
   { try
 	  {
-		jjtThis.setTypeSpec(Predefined.numberType);
+		jjtThis.setTypeSpec(Predefined.integerType);
       	jjtThis.setAttribute(VALUE, Integer.parseInt(token.image));
 	  }
 	  catch(Exception e){
@@ -483,11 +489,14 @@ void String() : {}
 
 
 JAVACODE
-//return the token name in string format
-void processVariableDecl(Token token, SymTabEntry variableId) #void
+void processVariableDecl(Token token, int index,
+                         ArrayList<SymTabEntry> variableList) #void
 {
+    SymTabEntry variableId = symTabStack.enterLocal(token.image);
+    variableId.setIndex(index);
     variableId.setDefinition(DefinitionImpl.VARIABLE);
     variableId.appendLineNumber(token.beginLine);
+    variableList.add(variableId);
 }
 
 

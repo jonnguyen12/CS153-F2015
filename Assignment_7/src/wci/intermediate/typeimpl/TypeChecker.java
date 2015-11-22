@@ -22,9 +22,9 @@ public class TypeChecker
      * @param type the type specification to check.
      * @return true if integer, else false.
      */
-    public static boolean isNumber(TypeSpec type)
+    public static boolean isInteger(TypeSpec type)
     {
-        return (type != null) && (type.baseType() == Predefined.numberType);
+        return (type != null) && (type.baseType() == Predefined.integerType);
     }
 
     /**
@@ -33,12 +33,43 @@ public class TypeChecker
      * @param type2 the second type specification to check.
      * @return true if both are integer, else false.
      */
-    public static boolean areBothNumber(TypeSpec type1, TypeSpec type2)
+    public static boolean areBothInteger(TypeSpec type1, TypeSpec type2)
     {
-        return isNumber(type1) && isNumber(type2);
+        return isInteger(type1) && isInteger(type2);
     }
 
+    /**
+     * Check if a type specification is real.
+     * @param type the type specification to check.
+     * @return true if real, else false.
+     */
+    public static boolean isReal(TypeSpec type)
+    {
+        return (type != null) && (type.baseType() == Predefined.realType);
+    }
 
+    /**
+     * Check if a type specification is integer or real.
+     * @param type the type specification to check.
+     * @return true if integer or real, else false.
+     */
+    public static boolean isIntegerOrReal(TypeSpec type)
+    {
+        return isInteger(type) || isReal(type);
+    }
+
+    /**
+     * Check if at least one of two type specifications is real.
+     * @param type1 the first type specification to check.
+     * @param type2 the second type specification to check.
+     * @return true if at least one is real, else false.
+     */
+    public static boolean isAtLeastOneReal(TypeSpec type1, TypeSpec type2)
+    {
+        return (isReal(type1) && isReal(type2)) ||
+               (isReal(type1) && isInteger(type2)) ||
+               (isInteger(type1) && isReal(type2));
+    }
 
     /**
      * Check if a type specification is boolean.
@@ -95,7 +126,7 @@ public class TypeChecker
         }
 
         // real := integer
-        else if (isNumber(targetType) && isNumber(valueType)) {
+        else if (isReal(targetType) && isInteger(valueType)) {
             compatible = true;
         }
 
@@ -132,7 +163,7 @@ public class TypeChecker
         }
 
         // One integer and one real.
-        else if (isNumber(type1) && isNumber(type2)) {
+        else if (isAtLeastOneReal(type1, type2)) {
             compatible = true;
         }
 

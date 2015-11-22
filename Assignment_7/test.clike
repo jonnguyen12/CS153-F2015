@@ -1,8 +1,6 @@
+define
+	i, j, k : integer;
+	
 int main() {
 
-double foo(int x,int y) {
-	return x*y;
-}
-
-int i = foo(3,4);
 }
