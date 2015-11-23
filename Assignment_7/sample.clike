@@ -1,13 +1,10 @@
-int main() {
-	define
-        i, x, t : integer; 
-    end     
+define
+        i : integer;
+        t, x : real; 
+end     
         x++;
-        
-        //error 
-        //int hello hello;
-        t = x;
-        x = t*t*t;
+        t = x++;
+        x = t*t*t+++
         t = t++;
 
         
@@ -22,17 +19,7 @@ int main() {
         else{
                 printf("Y is large number - %d\n",y);
         }
-        return u;
-        //for(x=7;i < 5;i++) {
-        //	for(j=7;j<10;j++) {
-        //		printf(i);
-        //		printf(j);
-        //	}
-        //}
-        
-        int foo(int y ,int  y) {
-        	x+y;
-        }
+        return i;
+
         
         foo(4,5.6);
-}

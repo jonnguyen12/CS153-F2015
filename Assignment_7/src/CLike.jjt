@@ -44,15 +44,24 @@ public class CLikeParser
 		Reader reader = new FileReader(sourceFilePath);
 		CLikeParser parser = new CLikeParser(reader);
 		SimpleNode rootNode = parser.Program();
-		rootNode.dump(">");
+		//rootNode.dump(">");
 
 		//Print cross reference
 		CrossReferencer crossReferencer = new CrossReferencer();
 		crossReferencer.print(symTabStack);
 
-		//print parse tree
-		//ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
-        //treePrinter.print(symTabStack);
+       // Visit the parse tree nodes to decorate them with type information.
+        TypeSetterVisitor typeVisitor = new TypeSetterVisitor();
+        rootNode.jjtAccept(typeVisitor, null);
+
+        // Create and initialize the ICode wrapper for the parse tree.
+        ICode iCode = ICodeFactory.createICode();
+        iCode.setRoot(rootNode);
+        programId.setAttribute(ROUTINE_ICODE, iCode);
+        
+        // Print the parse tree.
+        ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
+        treePrinter.print(symTabStack);
 
 
 		
@@ -244,7 +253,7 @@ SimpleNode Program() : {}
 	}
 	try {
 		Statements()
-		(< EOF >)? {return jjtThis;}
+		< EOF > {return jjtThis;}
 		 
 	}
 	catch (ParseException ex) {
@@ -256,10 +265,10 @@ SimpleNode Program() : {}
 
 void Statements(): {}
 {
-    
 	(Statement())*
 }
 
+//NO FUNCTIONS FOR NOW
 void Statement() #void :  {}
 {
   	//looadhead 3 for distinguishing Assignments and function declorations.
@@ -273,13 +282,13 @@ void Statement() #void :  {}
 	|LOOKAHEAD(2){System.out.println("=PARSING SIMPLE STATEMENT=");}
     SimpleStatement()
     {System.out.println("=END SIMPLE STATEMENT=");}
-	|{System.out.println("=PARSING FUNCTION DECLORATION=");}
-	 FunctionDeclaration()
-	 {System.out.println("=FUNCTION DECLORATION END=");}
+	//|{System.out.println("=PARSING FUNCTION DECLORATION=");}
+	 //FunctionDeclaration()
+	 //{System.out.println("=FUNCTION DECLORATION END=");}
 	|LOOKAHEAD(2){System.out.println("=PARSING FUNCTION CALL=");}
-	 FunctionCall()
-	 {System.out.println("=FUNCTION CALL END=");}	 
-	|{System.out.println("=PARSING IF STATEMENT=");}
+	 //FunctionCall()
+	 //{System.out.println("=FUNCTION CALL END=");}	 
+	//|{System.out.println("=PARSING IF STATEMENT=");}
 	 IfStatment()
 	 {System.out.println("=ENDING IF STATEMENT=");}
 	|{System.out.println("=PARSING WHILE LOOP=");}
@@ -295,16 +304,15 @@ void Statement() #void :  {}
 	
 }
 
-SimpleNode Assignment() : {}
+void Assignment() : {}
 {
   	//assignment statments eg (i = 0, i; or ;)
 	identifier()
 	{
-		//SymTabEntry variableId = symTabStack.lookup(token.image);
-        //variableId.appendLineNumber(token.beginLine);
+		SymTabEntry variableId = symTabStack.lookup(token.image);
+        variableId.appendLineNumber(token.beginLine);
 	} (<EQUAL>	Expression())? <SEMICOLON >
 
-	{return jjtThis;}
 
 }
 
@@ -422,7 +430,7 @@ void DataType() #void: {}
 
 void Operators() : {}
 {
-	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE > | < AND > | < OR > | < EQUAL >
+	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE > | < AND > | < OR > |< EQUAL >
 }
 
 
@@ -454,28 +462,42 @@ void identifier(): {}
 
 void Number() : {}
 {
-	< NUM >
-  { try
-	  {
-		jjtThis.setTypeSpec(Predefined.integerType);
-      	jjtThis.setAttribute(VALUE, Integer.parseInt(token.image));
-	  }
-	  catch(Exception e){
-	  	try
-	  	{
-			jjtThis.setAttribute(VALUE, Float.parseFloat(token.image));
-	  	}
-	  	catch(Exception e2)
-	  	{
-			//error end of line
-	  	}
-	  } 
-	  
-	  
-  }	
-
+ < NUM >
+ {
+    try{
+  	  jjtThis.setTypeSpec(Predefined.integerType);
+      jjtThis.setAttribute(VALUE, Integer.parseInt(token.image));
+  	  
+  	} catch( Exception e)
+  	{
+  	  	try
+  	  	{
+  	  	jjtThis.setTypeSpec(Predefined.realType);  
+        jjtThis.setAttribute(VALUE, Float.parseFloat(token.image)); 
+  	  	}catch( Exception e2)
+  	  	{
+			// must be error go to end of line 
+  	  	}
+  	}
+  } 
+}
+/*
+void real() : {}
+{
+    <REAL> {
+        jjtThis.setTypeSpec(Predefined.realType);
+        jjtThis.setAttribute(VALUE, Float.parseFloat(token.image));
+    }
 }
 
+void integer() : {}
+{
+    <INTEGER> {
+        jjtThis.setTypeSpec(Predefined.integerType);
+        jjtThis.setAttribute(VALUE, Integer.parseInt(token.image));
+    }
+}
+*/
 void Char() : {}
 {
 	< CHARACTER >
@@ -491,6 +513,13 @@ void String() : {}
 }
 
 
+void Error() #void : {}
+{
+    <ERROR>
+}
+
+
+
 JAVACODE
 void processVariableDecl(Token token, int index,
                          ArrayList<SymTabEntry> variableList) #void
@@ -504,19 +533,16 @@ void processVariableDecl(Token token, int index,
 
 
 JAVACODE
-String handleError(ParseException ex) {
+String handleError(ParseException ex) #void
+{
     Token token = ex.currentToken;
     System.out.println(ex.getMessage());
 
     do {
     	token = getNextToken();
-    } while (token.kind != SEMICOLON);
+    } while (token.kind != EOF);
 
-	jjtree.popNode();
+	//jjtree.popNode();
     return token.image;
 }
-
-
-
-
 

@@ -1,6 +1,1 @@
-define
-	i, j, k : integer;
-	
-int main() {
-
-}
+define x : integer; end
