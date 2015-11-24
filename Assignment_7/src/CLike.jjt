@@ -276,19 +276,19 @@ void Statement() #void :  {}
 	{System.out.println("=PARSING ASSIGNMENT=");}
 	Assignment()
 	{System.out.println("=END ASSIGNMENT=");}
-	|{System.out.println("=PARSING VARIABLE DECLARATION=");}
+	|LOOKAHEAD(3){System.out.println("=PARSING VARIABLE DECLARATION=");}
     variableDeclaration()
     {System.out.println("=END VARIABLE DECLARATION=");}	
 	|LOOKAHEAD(2){System.out.println("=PARSING SIMPLE STATEMENT=");}
     SimpleStatement()
     {System.out.println("=END SIMPLE STATEMENT=");}
-	//|{System.out.println("=PARSING FUNCTION DECLORATION=");}
-	 //FunctionDeclaration()
-	 //{System.out.println("=FUNCTION DECLORATION END=");}
+	|{System.out.println("=PARSING FUNCTION DECLORATION=");}
+	 FunctionDeclaration()
+	 {System.out.println("=FUNCTION DECLORATION END=");}
 	|LOOKAHEAD(2){System.out.println("=PARSING FUNCTION CALL=");}
-	 //FunctionCall()
-	 //{System.out.println("=FUNCTION CALL END=");}	 
-	//|{System.out.println("=PARSING IF STATEMENT=");}
+	 FunctionCall()
+	 {System.out.println("=FUNCTION CALL END=");}	 
+	|{System.out.println("=PARSING IF STATEMENT=");}
 	 IfStatment()
 	 {System.out.println("=ENDING IF STATEMENT=");}
 	|{System.out.println("=PARSING WHILE LOOP=");}
@@ -319,31 +319,35 @@ void Assignment() : {}
 void variableDeclaration() : {ArrayList<SymTabEntry> variableList;
 	                                 int index = 0;}
 {
-    <DEFINE>
-    (
-        <IDENTIFIER> {
-            variableList = new ArrayList<SymTabEntry>();
-            processVariableDecl(token, index++, variableList);
+  		DataType() {
+  		    variableList = new ArrayList<SymTabEntry>();
+	    	SymTabEntry typeId = symTabStack.lookup(token.image);
+	        typeId.appendLineNumber(token.beginLine);
+	        TypeSpec type = typeId.getTypeSpec();
+
         }
+
+        <IDENTIFIER> {
+
+            processVariableDecl(token, index++, variableList);
+            
+        }
+        
         (
             <COMMA>
             <IDENTIFIER> {
                 processVariableDecl(token, index++, variableList);
-            }
-        )*
-        <COLON>
-        DataType() {
-            SymTabEntry typeId = symTabStack.lookup(token.image);
-            typeId.appendLineNumber(token.beginLine);
-            TypeSpec type = typeId.getTypeSpec();
+            	//processVariableDecl(token, index++, variableList);          
+        	}
+            
+            
 
-            for (SymTabEntry variableId : variableList) {
-                variableId.setTypeSpec(type);
-            }
-        }
+        )*
+         {         	for (SymTabEntry variableId : variableList) {
+	        	variableId.setTypeSpec(type);
+	     	}
+		 }
         <SEMICOLON>
-    )+
-    < END >
 }
 
 
