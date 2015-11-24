@@ -3,7 +3,7 @@ int main() {
 		double t,x;
         x++;
         t = x++;
-        x = t*t*t+++
+        x = t*t*t;
         t = t++;
 
         
