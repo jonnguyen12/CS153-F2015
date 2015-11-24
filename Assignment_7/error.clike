@@ -1,0 +1,7 @@
+int hello;
+hello = 5;
+
+double more,;
+more = 5;
+
+printf(hello);

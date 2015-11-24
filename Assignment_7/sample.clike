@@ -1,7 +1,6 @@
-define
-        i : integer;
-        t, x : real; 
-end     
+int main() {
+		int i;
+		double t,x;
         x++;
         t = x++;
         x = t*t*t+++
@@ -23,3 +22,5 @@ end
 
         
         foo(4,5.6);
+        
+}
