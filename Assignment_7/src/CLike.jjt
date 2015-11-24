@@ -332,7 +332,7 @@ void variableDeclaration() : {ArrayList<SymTabEntry> variableList;
             }
         )*
         <COLON>
-        < IDENTIFIER > {
+        DataType() {
             SymTabEntry typeId = symTabStack.lookup(token.image);
             typeId.appendLineNumber(token.beginLine);
             TypeSpec type = typeId.getTypeSpec();

@@ -76,14 +76,14 @@ public class Predefined
     private static void initializeTypes(SymTabStack symTabStack)
     {
         // Type integer.
-        integerId = symTabStack.enterLocal("integer");
+        integerId = symTabStack.enterLocal("int");
         integerType = TypeFactory.createType(SCALAR);
         integerType.setIdentifier(integerId);
         integerId.setDefinition(DefinitionImpl.TYPE);
         integerId.setTypeSpec(integerType);
 
         // Type real.
-        realId = symTabStack.enterLocal("real");
+        realId = symTabStack.enterLocal("double");
         realType = TypeFactory.createType(SCALAR);
         realType.setIdentifier(realId);
         realId.setDefinition(DefinitionImpl.TYPE);
