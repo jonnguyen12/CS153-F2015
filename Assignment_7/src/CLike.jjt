@@ -63,46 +63,9 @@ public class CLikeParser
         // Print the parse tree.
         ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
         treePrinter.print(symTabStack);
-
-
-		
-      	
-      	/*byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
-	  	String content = new String(encoded, StandardCharsets.UTF_8);
-        java.io.StringReader sr = new java.io.StringReader(content);
-        CLikeParser parser = new CLikeParser(sr);
-        try {
-            SimpleNode root = parser.Program();
-            System.out.println("=====PRINTING PARSE TREE=====");
-            root.dump(">");
-            System.out.println("=====ENDING PARSE TREE=====");            
-        }
-        catch (ParseException ex) {
-            ex.printStackTrace();
-        }
-        */
     }		
 }
 PARSER_END(CLikeParser)
-/*
-TOKEN_MGR_DECLS : {
-    public static void main(String [] args) throws IOException
-    {
-	    byte[] encoded = Files.readAllBytes(Paths.get(args[0]));
-	    String content = new String(encoded, StandardCharsets.UTF_8);
-        java.io.StringReader sr = new java.io.StringReader(content);
-        SimpleCharStream scs = new SimpleCharStream(sr);
-        CLikeParserTokenManager mgr = new CLikeParserTokenManager(scs);
-
-
-		while (mgr.getNextToken().kind != EOF) {}
-
-    }
-
-
-    
-}
-*/
 
 SKIP : {
    <IGNORE : [" ", "\r", "\n", "\t"]>
@@ -249,8 +212,7 @@ SimpleNode Program() : {}
 	{
 		programId = symTabStack.enterLocal("CLike");
 		programId.setDefinition(DefinitionImpl.PROGRAM);
-		programId.setAttribute(ROUTINE_SYMTAB, symTabStack.push());
-        //programId.setAttribute(ROUTINE_ROUTINES, new ArrayList<SymTabEntry>());		
+		programId.setAttribute(ROUTINE_SYMTAB, symTabStack.push());	
 		symTabStack.setProgramId(programId);
 		
 	}
@@ -417,15 +379,6 @@ void returnStatement() : {}
 	< RETURN > Expression() < SEMICOLON >
 }
 
-
-//CONDITIONS eg ( a == 9, b <4  ect
-//void Conditions() : {}
-//{
-
-//	Expression() (Operators() Expression())*
-//}
-
-  
 
 void DataType(): {}
 {
