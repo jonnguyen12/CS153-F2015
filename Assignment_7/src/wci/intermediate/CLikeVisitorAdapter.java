@@ -17,6 +17,8 @@ import wci.frontend.ASTString;
 import wci.frontend.ASTassignmentType;
 import wci.frontend.ASTforLoop;
 import wci.frontend.ASTidentifier;
+import wci.frontend.ASTintegerConstant;
+import wci.frontend.ASTrealConstant;
 import wci.frontend.ASTreturnStatement;
 import wci.frontend.ASTvariableDeclaration;
 import wci.frontend.ASTwhileLoop;
@@ -114,13 +116,6 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 		return node.childrenAccept(this, data);
 	}
 
-
-	@Override
-	public Object visit(ASTNumber node, Object data) {
-		// TODO Auto-generated method stub
-		return node.childrenAccept(this, data);
-	}
-
 	@Override
 	public Object visit(ASTString node, Object data) {
 		// TODO Auto-generated method stub
@@ -135,6 +130,18 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 
 	@Override
 	public Object visit(ASTDataType node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTintegerConstant node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTrealConstant node, Object data) {
 		// TODO Auto-generated method stub
 		return node.childrenAccept(this, data);
 	}

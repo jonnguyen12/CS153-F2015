@@ -1,15 +1,15 @@
 package wci.backend.compiler;
 
-import java.util.ArrayList;
-import java.io.*;
-
-import wci.frontend.*;
+import com.sun.org.apache.xpath.internal.operations.Variable;
+import wci.backend.Backend;
+import wci.frontend.Node;
 import wci.intermediate.*;
+import wci.intermediate.symtabimpl.DefinitionImpl;
 import wci.intermediate.symtabimpl.Predefined;
-import wci.backend.*;
+import wci.intermediate.symtabimpl.SymTabKeyImpl;
 
-import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
-import static wci.intermediate.symtabimpl.DefinitionImpl.*;
+import java.io.PrintWriter;
+import java.util.List;
 
 /**
  * <p>The code generator for a compiler back end.</p>
@@ -20,7 +20,8 @@ import static wci.intermediate.symtabimpl.DefinitionImpl.*;
 public class CodeGenerator extends Backend
 {
     private static final int STACK_LIMIT = 16;
-        
+    public static final String PROGRAM_HEADER_CLASS_NAME = "CLikeProgram";
+
     static ICode iCode;
     static SymTabStack symTabStack;
     static PrintWriter objectFile;
@@ -30,12 +31,86 @@ public class CodeGenerator extends Backend
      * parser to generate machine-language instructions.
      * @param iCode the intermediate code.
      * @param symTabStack the symbol table stack.
-     * @param objectFile the object file path for the generated code.
+     * @param objectFilePath the object file path for the generated code.
      * @throws Exception if an error occurred.
      */
     public void process(ICode iCode, SymTabStack symTabStack,
                         String objectFilePath)
         throws Exception
     {
+        this.iCode = iCode;
+        this.symTabStack = symTabStack;
+        objectFile = new PrintWriter(objectFilePath);
+
+        writeProgramClassInfo();
+        writeMainMethod();
+
+        objectFile.flush();
+        objectFile.close();
+    }
+
+    private void writeProgramClassInfo() {
+        writeProgramHeader();
+        writeLocalVarFields();
+        writeProgramClassConstructor();
+    }
+
+    private void writeMainMethod() {
+        writeMainMethodHeader();
+        writeMainMethodBody();
+        // TODO Count the locals.
+        //objectFile.println(".limit locals " + localsCount);
+        objectFile.println(".limit stack " + STACK_LIMIT);
+        objectFile.println(".end method");
+    }
+
+    private void writeProgramHeader() {
+        objectFile.println(".class public " + PROGRAM_HEADER_CLASS_NAME);
+        objectFile.println(".super java/lang/Object");
+        objectFile.println();
+    }
+
+    private void writeLocalVarFields() {
+        SymTab routineSymTab = (SymTab) symTabStack.getProgramId().getAttribute(SymTabKeyImpl.ROUTINE_SYMTAB);
+        List<SymTabEntry> locals = routineSymTab.sortedEntries();
+        for (SymTabEntry id : locals) {
+            Definition definition = id.getDefinition();
+            if (definition == DefinitionImpl.VARIABLE) {
+                String fieldName = id.getName();
+                TypeSpec type = id.getTypeSpec();
+                String typeCode = TypeCode.typeSpecToTypeCode(type);
+
+                objectFile.println(".field private static " + fieldName + " " + typeCode);
+            }
+        }
+        objectFile.println();
+    }
+
+    private void writeProgramClassConstructor() {
+        objectFile.println(".method public <init>()V");
+        objectFile.println();
+        objectFile.println("	aload_0");
+        objectFile.println("	invokenonvirtual	java/lang/Object/<init>()V");
+        objectFile.println("	return");
+        objectFile.println();
+        objectFile.println(".limit locals 1");
+        objectFile.println(".limit stack 1");
+        objectFile.println(".end method");
+        objectFile.println();
+    }
+
+    private void writeMainMethodHeader() {
+        objectFile.println(".method public static main([Ljava/lang/String;)V");
+        objectFile.println();
+    }
+
+    private void writeMainMethodBody() {
+        CodeGeneratorVisitor codeVisitor = new CodeGeneratorVisitor();
+        Node rootNode = iCode.getRoot();
+        rootNode.jjtAccept(codeVisitor, null);
+
+        objectFile.println();
+        objectFile.println("    return");
+        objectFile.println();
     }
 }

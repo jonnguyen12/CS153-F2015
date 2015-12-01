@@ -1,7 +1,7 @@
-string hellp = 5;
+string hello = "hello world";
 
-int help = 1;
+string a = "a test";
 
-int main () {
+int b = 5;
 
-}
+double c = 5.3;
