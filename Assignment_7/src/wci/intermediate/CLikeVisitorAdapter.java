@@ -2,13 +2,11 @@ package wci.intermediate;
 
 
 import wci.frontend.ASTAssignment;
-import wci.frontend.ASTChar;
 import wci.frontend.ASTDataType;
 import wci.frontend.ASTExpression;
 import wci.frontend.ASTFunctionCall;
 import wci.frontend.ASTFunctionDeclaration;
 import wci.frontend.ASTIfStatment;
-import wci.frontend.ASTNumber;
 import wci.frontend.ASTOperators;
 import wci.frontend.ASTProgram;
 import wci.frontend.ASTSimpleStatement;
