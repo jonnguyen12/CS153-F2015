@@ -97,7 +97,7 @@ public class Predefined
         booleanId.setTypeSpec(booleanType);
 
         // Type char.
-        charId = symTabStack.enterLocal("char");
+        charId = symTabStack.enterLocal("string");
         charType = TypeFactory.createType(SCALAR);
         charType.setIdentifier(charId);
         charId.setDefinition(DefinitionImpl.TYPE);
@@ -138,9 +138,7 @@ public class Predefined
      */
     private static void initializeStandardRoutines(SymTabStack symTabStack)
     {
-        readId    = enterStandard(symTabStack, PROCEDURE, "read",    READ);
         readlnId  = enterStandard(symTabStack, PROCEDURE, "readln",  READLN);
-        writeId   = enterStandard(symTabStack, PROCEDURE, "write",   WRITE);
         writelnId = enterStandard(symTabStack, PROCEDURE, "writeln", WRITELN);
 
         absId    = enterStandard(symTabStack, FUNCTION, "abs",    ABS);

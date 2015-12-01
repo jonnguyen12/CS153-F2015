@@ -3,6 +3,7 @@ package wci.intermediate;
 
 import wci.frontend.ASTAssignment;
 import wci.frontend.ASTChar;
+import wci.frontend.ASTDataType;
 import wci.frontend.ASTExpression;
 import wci.frontend.ASTFunctionCall;
 import wci.frontend.ASTFunctionDeclaration;
@@ -37,104 +38,105 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 	@Override
 	public Object visit(ASTProgram node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 	@Override
 	public Object visit(ASTStatements node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 
 	@Override
 	public Object visit(ASTvariableDeclaration node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 	@Override
 	public Object visit(ASTFunctionDeclaration node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 	@Override
 	public Object visit(ASTFunctionCall node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 	@Override
 	public Object visit(ASTSimpleStatement node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 	@Override
 	public Object visit(ASTIfStatment node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 	@Override
 	public Object visit(ASTwhileLoop node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 	@Override
 	public Object visit(ASTforLoop node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 	@Override
 	public Object visit(ASTreturnStatement node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 	@Override
 	public Object visit(ASTOperators node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 	@Override
 	public Object visit(ASTassignmentType node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 	@Override
 	public Object visit(ASTExpression node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
-	@Override
-	public Object visit(ASTidentifier node, Object data) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public Object visit(ASTNumber node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(ASTChar node, Object data) {
-		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
 	}
 
 	@Override
 	public Object visit(ASTString node, Object data) {
 		// TODO Auto-generated method stub
-		return null;
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTidentifier node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTDataType node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
 	}
 
 

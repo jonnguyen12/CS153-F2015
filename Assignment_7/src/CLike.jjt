@@ -30,6 +30,7 @@ public class CLikeParser
 {
   	private static SymTabStack symTabStack;
   	private static SymTabEntry programId;
+  	//private static SymTabEntry functionId;  	
   	
     public static void main(String [] args) throws Exception
     {
@@ -50,7 +51,7 @@ public class CLikeParser
 		CrossReferencer crossReferencer = new CrossReferencer();
 		crossReferencer.print(symTabStack);
 
-       // Visit the parse tree nodes to decorate them with type information.
+       /// Visit the parse tree nodes to decorate them with type information.
         TypeSetterVisitor typeVisitor = new TypeSetterVisitor();
         rootNode.jjtAccept(typeVisitor, null);
 
@@ -131,7 +132,7 @@ TOKEN : {
  	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
  	| <INT : "int">
  	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
- 	| <CHAR : "char">
+ 	| <STRING_TYPE : "string">
  	{ debugStream.println("RESERVED_WORD token: " + matchedToken.image); }
   	| <WHILE : "while">
  	{ debugStream.println("WHILE token: " + matchedToken.image); }
@@ -249,7 +250,9 @@ SimpleNode Program() : {}
 		programId = symTabStack.enterLocal("CLike");
 		programId.setDefinition(DefinitionImpl.PROGRAM);
 		programId.setAttribute(ROUTINE_SYMTAB, symTabStack.push());
+        //programId.setAttribute(ROUTINE_ROUTINES, new ArrayList<SymTabEntry>());		
 		symTabStack.setProgramId(programId);
+		
 	}
 	try {
 		Statements()
@@ -307,7 +310,7 @@ void Statement() #void :  {}
 void Assignment() : {}
 {
   	//assignment statments eg (i = 0, i; or ;)
-	identifier()
+	< IDENTIFIER >
 	{
 		SymTabEntry variableId = symTabStack.lookup(token.image);
         variableId.appendLineNumber(token.beginLine);
@@ -347,20 +350,24 @@ void variableDeclaration() : {ArrayList<SymTabEntry> variableList;
 	        	variableId.setTypeSpec(type);
 	     	}
 		 }
+		(<EQUAL>	Expression())?
         <SEMICOLON>
 }
 
 
 
-void FunctionDeclaration() : {}
+void FunctionDeclaration() : {SimpleNode variableNode;}
 {
-    //cant use paramaterList here since we need type declorations.
-	DataType() identifier() <LEFT_PAREN > (DataType() Expression()(<COMMA > DataType() Expression())*)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+	DataType()
+	< IDENTIFIER > {
+		
+	}
+	 <LEFT_PAREN > (DataType() Expression()(<COMMA > DataType() Expression())*)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 
 void FunctionCall() : {}
 {
-	identifier() <LEFT_PAREN > paramaterList() < RIGHT_PAREN > 
+	< IDENTIFIER > <LEFT_PAREN > paramaterList() < RIGHT_PAREN > 
 }
 
 void paramaterList() #void : {}
@@ -402,7 +409,7 @@ void forLoop() : {}
 //need to add support for statments like i = i+1
 void forInc() #void : {}
 {
-	identifier() (incOrDec())
+	< IDENTIFIER > (incOrDec())
 }
 
 void returnStatement() : {}
@@ -420,13 +427,13 @@ void returnStatement() : {}
 
   
 
-void DataType() #void: {}
+void DataType(): {}
 {
 	
-	  < VOID >
+	< VOID > 
 	| < INT > 
 	| < DOUBLE > 
-	| < CHAR > 
+	| < STRING_TYPE > 
 	
 
 }
@@ -442,7 +449,7 @@ void Operators() : {}
 void assignmentType() : {}
 {
 
-	(LOOKAHEAD(2)FunctionCall()| Number() | identifier() | Char())incOrDec() | String()
+	(LOOKAHEAD(2)FunctionCall()| Number() | < IDENTIFIER >)incOrDec() | String()
 }
 
 
@@ -458,11 +465,6 @@ void incOrDec() #void: {}
 	(< INC > | < DEC >)?
 }
 
-void identifier(): {}
-{
-	< IDENTIFIER >
-
-}
 
 void Number() : {}
 {
@@ -485,28 +487,8 @@ void Number() : {}
   	}
   } 
 }
-/*
-void real() : {}
-{
-    <REAL> {
-        jjtThis.setTypeSpec(Predefined.realType);
-        jjtThis.setAttribute(VALUE, Float.parseFloat(token.image));
-    }
-}
 
-void integer() : {}
-{
-    <INTEGER> {
-        jjtThis.setTypeSpec(Predefined.integerType);
-        jjtThis.setAttribute(VALUE, Integer.parseInt(token.image));
-    }
-}
-*/
-void Char() : {}
-{
-	< CHARACTER >
-}
-
+//add strings since we prob wont do arrays
 void String() : {}
 {
 	< STRING >
@@ -515,6 +497,12 @@ void String() : {}
 		jjtThis.setAttribute(VALUE, new String(token.image));
 	}
 }
+
+void identifier() : {}
+{
+        < IDENTIFIER >
+}
+
 
 
 void Error() #void : {}
@@ -544,7 +532,7 @@ String handleError(ParseException ex) #void
 
     do {
     	token = getNextToken();
-    } while (token.kind != EOF);
+    } while (token.kind != SEMICOLON);
 
 	//jjtree.popNode();
     return token.image;
