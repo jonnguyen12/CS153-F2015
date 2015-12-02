@@ -18,7 +18,5 @@
         else{
                 printf("Y is large number - %d\n",y);
         }
-        return i;
 
-        
         foo(4,5.6);
