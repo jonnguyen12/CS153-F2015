@@ -10,8 +10,8 @@ public class CodeGeneratorVisitor
     extends CLikeVisitorAdapter
     implements CLikeParserTreeConstants
 {
-    public Object visit(ASTAssignment node, Object data)
-    {
+	
+    public Object visit(ASTAssignment node, Object data) {
     	String programName        = (String) data;
         SimpleNode variableNode   = (SimpleNode) node.jjtGetChild(0);
         SimpleNode expressionNode = (SimpleNode) node.jjtGetChild(1);
@@ -42,23 +42,22 @@ public class CodeGeneratorVisitor
         CodeGenerator.objectFile.flush();
 
         return data;
-    }
+}
     
-    public Object visit(ASTidentifier node, Object data)
-    {
-    	String programName = (String) data;
-        SymTabEntry id = (SymTabEntry) node.getAttribute(ID);
-        String fieldName = id.getName();
-        TypeSpec type = id.getTypeSpec();
-        String typeCode = type == Predefined.integerType ? "I" : "F";
+public Object visit(ASTidentifier node, Object data) {
+	String programName = (String) data;
+    SymTabEntry id = (SymTabEntry) node.getAttribute(ID);
+    String fieldName = id.getName();
+    TypeSpec type = id.getTypeSpec();
+    String typeCode = type == Predefined.integerType ? "I" : "F";
 
-        // Emit the appropriate load instruction.
-        CodeGenerator.objectFile.println("    getstatic " + programName +
-                "/" + fieldName + " " + typeCode);
-        CodeGenerator.objectFile.flush();
+    // Emit the appropriate load instruction.
+    CodeGenerator.objectFile.println("    getstatic " + programName +
+            "/" + fieldName + " " + typeCode);
+    CodeGenerator.objectFile.flush();
 
-        return data;
-    }
+    return data;
+}
 
     public Object visit(ASTintegerConstant node, Object data)
     {

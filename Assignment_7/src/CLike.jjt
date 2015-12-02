@@ -417,7 +417,7 @@ void Operators() : {}
 void assignmentType() : {}
 {
 
-	(LOOKAHEAD(2)FunctionCall()| Number() | < IDENTIFIER >)incOrDec() | String()
+	(LOOKAHEAD(2)FunctionCall()| Number() | identifier())incOrDec() | String()
 }
 
 

@@ -1,6 +1,6 @@
-int main() {
+
 		int i;
-		double t,x;
+		double t,x,y;
         x++;
         t = x++;
         x = t*t*t;
@@ -22,5 +22,3 @@ int main() {
 
         
         foo(4,5.6);
-        
-}
