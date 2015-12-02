@@ -334,10 +334,10 @@ void FunctionDeclaration() : {SimpleNode variableNode;}
 {
 	DataType()
 	< IDENTIFIER > {
-		SymTabEntry functionId = symTabStack.enterLocal(token.image);
-		functionId.setDefinition(DefinitionImpl.FUNCTION);		
-		functionId.setAttribute(ROUTINE_ROUTINES, symTabStack.push());
-		jjtThis.setAttribute(ID, functionId);
+		//SymTabEntry functionId = symTabStack.enterLocal(token.image);
+		//functionId.setDefinition(DefinitionImpl.FUNCTION);		
+		//functionId.setAttribute(ROUTINE_ROUTINES, symTabStack.push());
+		//jjtThis.setAttribute(ID, functionId);
 	}
 	 <LEFT_PAREN > (DataType() Expression()(<COMMA > DataType() Expression())*)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
