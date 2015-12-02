@@ -409,7 +409,7 @@ void DataType(): {}
 
 void Operators() : {}
 {
-	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE > | < AND > | < OR > |< EQUAL >
+	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE > | < AND > | < OR >
 }
 
 

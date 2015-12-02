@@ -10,7 +10,7 @@ public class CodeGeneratorVisitor
     extends CLikeVisitorAdapter
     implements CLikeParserTreeConstants
 {
-	
+/*	
     public Object visit(ASTAssignment node, Object data) {
     	String programName        = (String) data;
         SimpleNode variableNode   = (SimpleNode) node.jjtGetChild(0);
@@ -43,7 +43,7 @@ public class CodeGeneratorVisitor
 
         return data;
 }
-    
+*/ 
 public Object visit(ASTidentifier node, Object data) {
 	String programName = (String) data;
     SymTabEntry id = (SymTabEntry) node.getAttribute(ID);
