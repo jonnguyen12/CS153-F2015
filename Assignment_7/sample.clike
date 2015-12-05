@@ -1,22 +1,34 @@
-
+int main () {
 		int i;
 		double t,x,y;
+		string hello = "hello world";
         x++;
         t = x++;
         x = t*t*t;
         t = t++;
+
 
         
         printf("Enter value for x :");
         scanf("%d",x);
         printf("Enter value for y :");
         scanf("%d",y);
-        
+
         if ( x > y++ ){
                 printf("X is large number - %d\n",x);
         }
         else{
                 printf("Y is large number - %d\n",y);
         }
+        
+        while(x < y) {
+        	x++;
+        }
 
-        foo(4,5.6);
+
+		double foo (int x, double y) {
+			return x*y;
+		}
+        double z = foo(4,5.6);
+        
+}
