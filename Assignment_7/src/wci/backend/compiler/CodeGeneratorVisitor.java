@@ -12,37 +12,23 @@ public class CodeGeneratorVisitor
 {
 
     public Object visit(ASTAssignment node, Object data) {
-    	String programName        = (String) data;
         SimpleNode variableNode   = (SimpleNode) node.jjtGetChild(0);
         SimpleNode expressionNode = (SimpleNode) node.jjtGetChild(1);
 
-        // Emit code for the expression.
         expressionNode.jjtAccept(this, data);
-        TypeSpec expressionType = expressionNode.getTypeSpec();
-
-        // Get the assignment target type.
-        TypeSpec targetType = node.getTypeSpec();
-
-        // Convert an integer value to float if necessary.
-        if ((targetType == Predefined.realType) &&
-            (expressionType == Predefined.integerType))
-        {
-            CodeGenerator.objectFile.println("    i2f");
-            CodeGenerator.objectFile.flush();
-        }
 
         SymTabEntry id = (SymTabEntry) variableNode.getAttribute(ID);
         String fieldName = id.getName();
         TypeSpec type = id.getTypeSpec();
-        String typeCode = type == Predefined.integerType ? "I" : "F";
+        String typeCode = TypeCode.typeSpecToTypeCode(type);
 
         // Emit the appropriate store instruction.
-        CodeGenerator.objectFile.println("    putstatic " + CodeGenerator.PROGRAM_HEADER_CLASS_NAME +
-        		                         "/" + fieldName + " " + typeCode);
+        CodeGenerator.objectFile.println("      putstatic " + CodeGenerator.PROGRAM_HEADER_CLASS_NAME +
+                "/" + fieldName + " " + typeCode);
         CodeGenerator.objectFile.flush();
 
         return data;
-}
+    }
 
 public Object visit(ASTidentifier node, Object data) {
 	String programName = (String) data;
@@ -264,7 +250,7 @@ public Object visit(ASTidentifier node, Object data) {
       			generate_float_print_code(id.getName(), 0f, data);
       		}
       		//generate code for printing number literal
-      		else if(nodeToPrint.toString().equals("number")) {
+      		else if(nodeToPrint.toString().equals("realConstant")) {
 //      			System.out.println("NUMBER!!!!!!!!!!!!");
 //      			System.out.println("value "+nodeToPrint.getAttribute(VALUE).toString());
       			float val = Float.parseFloat( nodeToPrint.getAttribute(VALUE).toString() );
