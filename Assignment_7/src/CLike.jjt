@@ -326,6 +326,7 @@ void variableDeclaration() #void : {ArrayList<SymTabEntry> variableList;
 	        typeId.appendLineNumber(token.beginLine);
 	        TypeSpec type = typeId.getTypeSpec();
 
+
         }
 
         <IDENTIFIER> {
@@ -441,24 +442,12 @@ void Operators() #void: {}
 }
 
 
-//types that can be assigned to a variable
-void assignmentType() : {}
-{
-
-	(LOOKAHEAD(2)FunctionCall()| Number() | identifier())incOrDec() | String()
-}
-
 
 void incOrDec() #void: {}
 {
 	(< INC > | < DEC >)?
 }
 
-
-void Number() #void : {}
-{
-  (integerConstant() | realConstant())
-}
 
 void integerConstant() : {}
 {

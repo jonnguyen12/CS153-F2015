@@ -104,7 +104,6 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 		return node.childrenAccept(this, data);
 	}
 
-	@Override
 	public Object visit(ASTassignmentType node, Object data) {
 		// TODO Auto-generated method stub
 		return node.childrenAccept(this, data);
