@@ -12,12 +12,17 @@ import wci.frontend.ASTProgram;
 import wci.frontend.ASTSimpleStatement;
 import wci.frontend.ASTStatements;
 import wci.frontend.ASTString;
+import wci.frontend.ASTadd;
 import wci.frontend.ASTassignmentType;
+import wci.frontend.ASTdivide;
 import wci.frontend.ASTforLoop;
 import wci.frontend.ASTidentifier;
 import wci.frontend.ASTintegerConstant;
+import wci.frontend.ASTmultiply;
+import wci.frontend.ASTprintln;
 import wci.frontend.ASTrealConstant;
 import wci.frontend.ASTreturnStatement;
+import wci.frontend.ASTsubtract;
 import wci.frontend.ASTvariableDeclaration;
 import wci.frontend.ASTwhileLoop;
 import wci.frontend.CLikeParserVisitor;
@@ -41,14 +46,12 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 		return node.childrenAccept(this, data);
 	}
 
-	@Override
 	public Object visit(ASTStatements node, Object data) {
 		// TODO Auto-generated method stub
 		return node.childrenAccept(this, data);
 	}
 
 
-	@Override
 	public Object visit(ASTvariableDeclaration node, Object data) {
 		// TODO Auto-generated method stub
 		return node.childrenAccept(this, data);
@@ -96,7 +99,6 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 		return node.childrenAccept(this, data);
 	}
 
-	@Override
 	public Object visit(ASTOperators node, Object data) {
 		// TODO Auto-generated method stub
 		return node.childrenAccept(this, data);
@@ -108,7 +110,6 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 		return node.childrenAccept(this, data);
 	}
 
-	@Override
 	public Object visit(ASTExpression node, Object data) {
 		// TODO Auto-generated method stub
 		return node.childrenAccept(this, data);
@@ -126,7 +127,6 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 		return node.childrenAccept(this, data);
 	}
 
-	@Override
 	public Object visit(ASTDataType node, Object data) {
 		// TODO Auto-generated method stub
 		return node.childrenAccept(this, data);
@@ -140,6 +140,36 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 
 	@Override
 	public Object visit(ASTrealConstant node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTadd node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTsubtract node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTmultiply node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTdivide node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTprintln node, Object data) {
 		// TODO Auto-generated method stub
 		return node.childrenAccept(this, data);
 	}

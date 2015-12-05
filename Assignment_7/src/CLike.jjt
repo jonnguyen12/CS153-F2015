@@ -118,7 +118,8 @@ TOKEN : {
    	| <DEFINE : "define">
  	{ debugStream.println("DEFINE token: " + matchedToken.image); }
    	| <END : "end">
- 	{ debugStream.println("END token: " + matchedToken.image); }	  	 	  	 		
+ 	{ debugStream.println("END token: " + matchedToken.image); }
+ 	| <PRINTLN : "println">	  	 	  	 		
 
 }
 //Special Symbols
@@ -239,7 +240,7 @@ SimpleNode Program() : {}
 }
 
 
-void Statements(): {}
+void Statements()#void: {}
 {
 	(Statement())*
 }
@@ -276,23 +277,47 @@ void Statement() #void :  {}
     | {System.out.println("=PARSING FOR LOOP=");}
       forLoop()
       {System.out.println("=END FOR LOOP=");}
+    | println()      
 
 	
 }
 
 void Assignment() : {}
 {
-  	//assignment statments eg (i = 0, i; or ;)
-	< IDENTIFIER >
-	{
-		SymTabEntry variableId = symTabStack.lookup(token.image);
+    identifier() {
+        SymTabEntry variableId = symTabStack.lookup(token.image);
         variableId.appendLineNumber(token.beginLine);
-	} (<EQUAL>	Expression())? <SEMICOLON >
-
-
+    }
+    <EQUAL>
+    (expression() | String())
+    < SEMICOLON >
 }
 
-void variableDeclaration() : {ArrayList<SymTabEntry> variableList;
+void expression() #void : {}
+{
+    term() (
+        "+" term() #add(2)
+      | "-" term() #subtract(2)
+    )*     
+}
+
+void term() #void : {}
+{
+    factor() (
+        "*" factor() #multiply(2)
+      | "/" factor() #divide(2)
+    )*     
+}
+
+void factor() #void : {}
+{
+    identifier()
+  | integerConstant()
+  | realConstant()
+}
+
+
+void variableDeclaration() #void : {ArrayList<SymTabEntry> variableList;
 	                                 int index = 0;}
 {
   		DataType() {
@@ -307,8 +332,7 @@ void variableDeclaration() : {ArrayList<SymTabEntry> variableList;
 
             processVariableDecl(token, index++, variableList);
             
-        }
-        
+        }   
         (
             <COMMA>
             <IDENTIFIER> {
@@ -323,7 +347,6 @@ void variableDeclaration() : {ArrayList<SymTabEntry> variableList;
 	        	variableId.setTypeSpec(type);
 	     	}
 		 }
-		(<EQUAL>	Expression())?
         <SEMICOLON>        {
         	programId.setAttribute(ROUTINE_LOCALS_COUNT, index);        }
 }
@@ -339,23 +362,23 @@ void FunctionDeclaration() : {SimpleNode variableNode;}
 		functionId.setAttribute(ROUTINE_ROUTINES, symTabStack.push());
 		jjtThis.setAttribute(ID, functionId);
 	}
-	 <LEFT_PAREN > (DataType() Expression()(<COMMA > DataType() Expression())*)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+	 <LEFT_PAREN > (DataType() < IDENTIFIER >(<COMMA > DataType() < IDENTIFIER >)*)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 
 void FunctionCall() : {}
 {
-	< IDENTIFIER > <LEFT_PAREN > paramaterList() < RIGHT_PAREN > 
+	< IDENTIFIER > <LEFT_PAREN > paramaterList() < RIGHT_PAREN > < SEMICOLON >
 }
 
 void paramaterList() #void : {}
 {
-	(Expression() (<COMMA > Expression())*)*
+	(expression() (<COMMA > expression())*)*
 }
 
 //statments such as (z++;, z*z;)
 void SimpleStatement() : {}
 {
-	Expression() < SEMICOLON >
+	expression() < SEMICOLON >
 }
 
 
@@ -366,7 +389,7 @@ void IfStatment() : {}
 
 void If_Part() #void: {}
 {
-  < IF > <LEFT_PAREN > Expression() < RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+  < IF > <LEFT_PAREN > expression() < RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 
 void Else_Part() #void: {}
@@ -376,12 +399,12 @@ void Else_Part() #void: {}
 
 void whileLoop() : {}
 {
-  < WHILE > <LEFT_PAREN > Expression() < RIGHT_PAREN > <LEFT_BRACKET> Statements() < RIGHT_BRACKET >
+  < WHILE > <LEFT_PAREN > expression() < RIGHT_PAREN > <LEFT_BRACKET> Statements() < RIGHT_BRACKET >
 }
 
 void forLoop() : {}
 {
-	< FOR ><LEFT_PAREN >  Expression()< SEMICOLON > forInc()< RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+	< FOR ><LEFT_PAREN >  expression()< SEMICOLON > forInc()< RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 //need to add support for statments like i = i+1
 void forInc() #void : {}
@@ -391,11 +414,11 @@ void forInc() #void : {}
 
 void returnStatement() : {}
 {
-	< RETURN > Expression() < SEMICOLON >
+	< RETURN > expression() < SEMICOLON >
 }
 
 
-void DataType(): {}
+void DataType()#void:{}
 {
 	
 	< VOID > 
@@ -406,8 +429,13 @@ void DataType(): {}
 
 }
 
+void println() : {}
+{
+    <PRINTLN> <LEFT_PAREN> factor() <RIGHT_PAREN> <SEMICOLON>
+}
 
-void Operators() : {}
+
+void Operators() #void: {}
 {
 	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE > | < AND > | < OR >
 }
@@ -421,13 +449,6 @@ void assignmentType() : {}
 }
 
 
-
-void Expression() : {}
-{
-	assignmentType() (Operators() assignmentType())*
-}
-
-
 void incOrDec() #void: {}
 {
 	(< INC > | < DEC >)?
@@ -436,32 +457,12 @@ void incOrDec() #void: {}
 
 void Number() #void : {}
 {
-  integerConstant() | realConstant()
-/*
- < NUM >
- {
-    try{
-  	  jjtThis.setTypeSpec(Predefined.integerType);
-      jjtThis.setAttribute(VALUE, Integer.parseInt(token.image));
-  	  
-  	} catch( Exception e)
-  	{
-  	  	try
-  	  	{
-  	  	jjtThis.setTypeSpec(Predefined.realType);  
-        jjtThis.setAttribute(VALUE, Float.parseFloat(token.image)); 
-  	  	}catch( Exception e2)
-  	  	{
-			// must be error go to end of line 
-  	  	}
-  	}
-  }
-  */ 
+  (integerConstant() | realConstant())
 }
 
 void integerConstant() : {}
 {
-    <INTEGER> {
+    <INTEGER>  {
         jjtThis.setTypeSpec(Predefined.integerType);
         jjtThis.setAttribute(VALUE, Integer.parseInt(token.image));
     }
@@ -475,7 +476,7 @@ void realConstant() : {}
     }
 }
 
-//add strings since we prob wont do arrays
+
 void String() : {}
 {
 	< STRING >

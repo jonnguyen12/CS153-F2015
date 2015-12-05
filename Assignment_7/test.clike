@@ -1,7 +1,10 @@
-string hello = "hello world";
+double i;
+double j;
 
-string a = "a test";
+i = 6.0;
+j = 2.5;
 
-int b = 5;
 
-double c = 5.3;
+i = i * j;
+
+println(i);
