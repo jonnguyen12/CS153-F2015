@@ -217,57 +217,48 @@ public Object visit(ASTidentifier node, Object data) {
 
     
     public Object visit(ASTprintln node, Object data) {
-//      CodeGenerator.objectFile.println("      getstatic java/lang/System/out Ljava/io/PrintStream;");
 
       SimpleNode nodeToPrint = (SimpleNode) node.jjtGetChild(0);
-//     System.out.println (nodeToPrint.toString());
+
       String typePrefix = TypeCode.typeSpecToTypeCode(nodeToPrint.getTypeSpec());
       SimpleNode addend0Node = (SimpleNode) node.jjtGetChild(0);
       SymTabEntry id = (SymTabEntry) addend0Node.getAttribute(ID);
-//      System.out.println( "name " + id.getName());
-//      System.out.println( id.getAttribute());
+
       if(typePrefix.equals("F")) {
-    	  
-//      	generate_float_print_code(nodeToPrint, data);
     	  	//generate code for printing an identifier to a float
       		if(nodeToPrint.toString().equals("identifier")) {
       			genFloatPrint(id.getName(), 0f, data);
       		}
       		//generate code for printing number literal
       		else if(nodeToPrint.toString().equals("realConstant")) {
-//      			System.out.println("NUMBER!!!!!!!!!!!!");
-//      			System.out.println("value "+nodeToPrint.getAttribute(VALUE).toString());
       			float val = Float.parseFloat( nodeToPrint.getAttribute(VALUE).toString() );
       			genFloatPrint(null, val, data);
       		}
       }
       if(typePrefix.equals("I")) {
-    	  
-//    	generate_float_print_code(nodeToPrint, data);
-  	  	//generate code for printing an identifier to a float
     		if(nodeToPrint.toString().equals("identifier")) {
     			genIntegerPrint(id.getName(), 0, data);
     		}
     		//generate code for printing number literal
     		else if(nodeToPrint.toString().equals("integerConstant")) {
-//    			System.out.println("NUMBER!!!!!!!!!!!!");
-//    			System.out.println("value "+nodeToPrint.getAttribute(VALUE).toString());
+
     			int val = Integer.parseInt( nodeToPrint.getAttribute(VALUE).toString() );
     			genIntegerPrint(null, val, data);
     		}
     }      
       
       if(typePrefix.equals("Ljava/lang/String;")) {
-    	  System.out.println("FOUND A STRING!!!!!");
     	  if(nodeToPrint.toString().equals("identifier")) {
-    			System.out.println("found string var!!!!!");
     			genStringPrint(id.getName(), "", data);
     	  }
-    	  else if(nodeToPrint.toString().equals("string")) {
-    		  System.out.println("found string literal!!!!!");
+    	  else if(nodeToPrint.toString().equals("String")) {
     		  String val = nodeToPrint.getAttribute(VALUE).toString();
     		  genStringPrint(null, val, data);
     	  }
+      }
+      else {
+    	  throw new IllegalArgumentException("That data type is not supported for printing.");
+    	  
       }
 
       return data;

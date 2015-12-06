@@ -289,7 +289,7 @@ void Assignment() : {}
         variableId.appendLineNumber(token.beginLine);
     }
     <EQUAL>
-    (expression() | String())
+    (expression())
     < SEMICOLON >
 }
 
@@ -311,7 +311,8 @@ void term() #void : {}
 
 void factor() #void : {}
 {
-    identifier()
+  String()
+  | identifier()
   | integerConstant()
   | realConstant()
 }
@@ -422,8 +423,7 @@ void returnStatement() : {}
 void DataType()#void:{}
 {
 	
-	< VOID > 
-	| < INT > 
+    < INT > 
 	| < DOUBLE > 
 	| < STRING_TYPE > 
 	
