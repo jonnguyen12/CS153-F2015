@@ -1,14 +1,26 @@
-double i,j;
+//string hello;
 
-i = 4.0;
-j = 2.0;
+//hello = "hello" + "hel";
+
+string i,j,k;
+
+i = "hello";
+j = " world";
+//k = "this is a test";
+
+i = i + j;
+
+println(i);
+
+int a,b,c;
+a = 4;
+b = 6;
+c = 10;
+
+a = a + b;
+
+println(a);
 
 
-i = i+j;
-println(i);
-i = i*j;
-println(i);
-i = i-j;
-println(i);
-i = i/j;
-println(i);
+
+

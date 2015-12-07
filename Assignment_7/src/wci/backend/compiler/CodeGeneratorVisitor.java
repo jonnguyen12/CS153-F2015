@@ -33,12 +33,24 @@ public class CodeGeneratorVisitor
 public Object visit(ASTidentifier node, Object data) {
     SymTabEntry id = (SymTabEntry) node.getAttribute(ID);
     String fieldName = id.getName();
-    TypeSpec type = id.getTypeSpec(); 
-    String typeCode = type == Predefined.integerType ? "I" : "F";
+    TypeSpec typeSpc = id.getTypeSpec(); 
+    String typeCode = TypeCode.typeSpecToTypeCode(typeSpc);
+
+    String type = "";
+    if(typeCode.equals("I")) {
+    	type = "I";
+    }
+    else if(typeCode.equals("F")) {
+    	type= "F";
+    }
+    else if (typeCode.equals("Ljava/lang/String;")) {
+    	type = "Ljava/lang/String;";
+    }    
+    //String typeCode = type == Predefined.integerType ? "I" : "F";
 
     // Emit the appropriate load instruction.
     CodeGenerator.objectFile.println("    getstatic " + CodeGenerator.PROGRAM_HEADER_CLASS_NAME +
-            "/" + fieldName + " " + typeCode);
+            "/" + fieldName + " " + type);
     CodeGenerator.objectFile.flush();
 
     return data;
@@ -79,38 +91,39 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend0Node = (SimpleNode) node.jjtGetChild(0);
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
-        TypeSpec type0 = addend0Node.getTypeSpec();
-        TypeSpec type1 = addend1Node.getTypeSpec();
-
         // Get the addition type.
         SymTabEntry id = (SymTabEntry) addend0Node.getAttribute(ID);
-        TypeSpec type = id.getTypeSpec();
         
-        String typeCode = type == Predefined.integerType ? "i" : "f";     
-
-        // Emit code for the first expression
-        // with type conversion if necessary.
-        addend0Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
-            (type0 == Predefined.integerType))
-        {
-            CodeGenerator.objectFile.println("    i2f");
-            CodeGenerator.objectFile.flush();
+        String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());   
+        System.out.println(typeCode);
+        String type = "";
+        if(typeCode.equals("I")) {
+        	type = "i";
+        }
+        else if(typeCode.equals("F")) {
+        	type= "f";
+        }
+        else if (typeCode.equals("Ljava/lang/String;")) {
+        	type = "c";
         }
 
-        // Emit code for the second expression
-        // with type conversion if necessary.
-        addend1Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
-            (type1 == Predefined.integerType))
-        {
-            CodeGenerator.objectFile.println("    i2f");
-            CodeGenerator.objectFile.flush();
+        if(type == "i" || type == "f") {
+            addend0Node.jjtAccept(this, data);
+            addend1Node.jjtAccept(this, data);
+	        // Emit the appropriate add instruction.
+	        CodeGenerator.objectFile.println("    " + type + "add");
+	        CodeGenerator.objectFile.flush();
         }
-
-        // Emit the appropriate add instruction.
-        CodeGenerator.objectFile.println("    " + typeCode + "add");
-        CodeGenerator.objectFile.flush();
+        else if (type == "c") {
+        	CodeGenerator.objectFile.println("       new java/lang/StringBuilder");
+        	CodeGenerator.objectFile.println("       dup");
+            addend0Node.jjtAccept(this, data);
+        	CodeGenerator.objectFile.println("       invokestatic java/lang/String/valueOf(Ljava/lang/Object;)Ljava/lang/String;");
+        	CodeGenerator.objectFile.println("       invokespecial java/lang/StringBuilder/<init>(Ljava/lang/String;)V");   
+            addend1Node.jjtAccept(this, data);        	
+        	CodeGenerator.objectFile.println("       invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+        	CodeGenerator.objectFile.println("       invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");        	
+        }
 
         return data;
     }
@@ -120,35 +133,15 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend0Node = (SimpleNode) node.jjtGetChild(0);
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
-        TypeSpec type0 = addend0Node.getTypeSpec();
-        TypeSpec type1 = addend1Node.getTypeSpec();
-
         // Get the addition type.
         SymTabEntry id = (SymTabEntry) addend0Node.getAttribute(ID);
         TypeSpec type = id.getTypeSpec();
         
         String typeCode = type == Predefined.integerType ? "i" : "f";     
 
-        // Emit code for the first expression
-        // with type conversion if necessary.
         addend0Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
-            (type0 == Predefined.integerType))
-        {
-            CodeGenerator.objectFile.println("    i2f");
-            CodeGenerator.objectFile.flush();
-        }
-
-        // Emit code for the second expression
-        // with type conversion if necessary.
-        addend1Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
-            (type1 == Predefined.integerType))
-        {
-            CodeGenerator.objectFile.println("    i2f");
-            CodeGenerator.objectFile.flush();
-        }
-
+        addend1Node.jjtAccept(this, data);        
+        
         // Emit the appropriate add instruction.
         CodeGenerator.objectFile.println("    " + typeCode + "sub");
         CodeGenerator.objectFile.flush();
@@ -179,35 +172,16 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend0Node = (SimpleNode) node.jjtGetChild(0);
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
-        TypeSpec type0 = addend0Node.getTypeSpec();
-        TypeSpec type1 = addend1Node.getTypeSpec();
-
         // Get the addition type.
         SymTabEntry id = (SymTabEntry) addend0Node.getAttribute(ID);
         TypeSpec type = id.getTypeSpec();
         
         String typeCode = type == Predefined.integerType ? "i" : "f";     
 
-        // Emit code for the first expression
-        // with type conversion if necessary.
         addend0Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
-            (type0 == Predefined.integerType))
-        {
-            CodeGenerator.objectFile.println("    i2f");
-            CodeGenerator.objectFile.flush();
-        }
-
-        // Emit code for the second expression
-        // with type conversion if necessary.
         addend1Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
-            (type1 == Predefined.integerType))
-        {
-            CodeGenerator.objectFile.println("    i2f");
-            CodeGenerator.objectFile.flush();
-        }
-
+        
+        
         // Emit the appropriate add instruction.
         CodeGenerator.objectFile.println("    " + typeCode + "div");
         CodeGenerator.objectFile.flush();
@@ -235,7 +209,7 @@ public Object visit(ASTidentifier node, Object data) {
       			genFloatPrint(null, val, data);
       		}
       }
-      if(typePrefix.equals("I")) {
+      else if(typePrefix.equals("I")) {
     		if(nodeToPrint.toString().equals("identifier")) {
     			genIntegerPrint(id.getName(), 0, data);
     		}
@@ -247,7 +221,7 @@ public Object visit(ASTidentifier node, Object data) {
     		}
     }      
       
-      if(typePrefix.equals("Ljava/lang/String;")) {
+      else if(typePrefix.equals("Ljava/lang/String;")) {
     	  if(nodeToPrint.toString().equals("identifier")) {
     			genStringPrint(id.getName(), "", data);
     	  }
