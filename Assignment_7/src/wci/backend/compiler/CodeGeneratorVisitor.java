@@ -91,11 +91,8 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend0Node = (SimpleNode) node.jjtGetChild(0);
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
-        // Get the addition type.
-        SymTabEntry id = (SymTabEntry) addend0Node.getAttribute(ID);
-        
+
         String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());   
-        System.out.println(typeCode);
         String type = "";
         if(typeCode.equals("I")) {
         	type = "i";
@@ -115,6 +112,7 @@ public Object visit(ASTidentifier node, Object data) {
 	        CodeGenerator.objectFile.flush();
         }
         else if (type == "c") {
+        	//String concatination code gen
         	CodeGenerator.objectFile.println("       new java/lang/StringBuilder");
         	CodeGenerator.objectFile.println("       dup");
             addend0Node.jjtAccept(this, data);
@@ -133,19 +131,25 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend0Node = (SimpleNode) node.jjtGetChild(0);
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
-        // Get the addition type.
-        SymTabEntry id = (SymTabEntry) addend0Node.getAttribute(ID);
-        TypeSpec type = id.getTypeSpec();
-        
-        String typeCode = type == Predefined.integerType ? "i" : "f";     
 
-        addend0Node.jjtAccept(this, data);
-        addend1Node.jjtAccept(this, data);        
-        
-        // Emit the appropriate add instruction.
-        CodeGenerator.objectFile.println("    " + typeCode + "sub");
-        CodeGenerator.objectFile.flush();
-
+        String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());   
+        String type = "";
+        if(typeCode.equals("I")) {
+        	type = "i";
+        }
+        else if(typeCode.equals("F")) {
+        	type= "f";
+        }
+        else {
+        	throw new UnsupportedOperationException("Invalid type for Subtraction");
+        }
+        if(type == "i" || type == "f") {
+            addend0Node.jjtAccept(this, data);
+            addend1Node.jjtAccept(this, data);
+	        // Emit the appropriate add instruction.
+	        CodeGenerator.objectFile.println("    " + type + "sub");
+	        CodeGenerator.objectFile.flush();
+        }
         return data;
     }
 
@@ -153,16 +157,26 @@ public Object visit(ASTidentifier node, Object data) {
     {
         SimpleNode addend0Node = (SimpleNode) node.jjtGetChild(0);
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
-        SymTabEntry id = (SymTabEntry) addend0Node.getAttribute(ID);
-        TypeSpec type = id.getTypeSpec();
-        
-        String typeCode = type == Predefined.integerType ? "i" : "f";        
 
-        addend0Node.jjtAccept(this, data);
-        addend1Node.jjtAccept(this, data);
+        String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());   
+        String type = "";
+        if(typeCode.equals("I")) {
+        	type = "i";
+        }
+        else if(typeCode.equals("F")) {
+        	type= "f";
+        }
+        else {
+        	throw new UnsupportedOperationException("Invalid type for Multiplucation");
+        }
+        if(type == "i" || type == "f") {
+            addend0Node.jjtAccept(this, data);
+            addend1Node.jjtAccept(this, data);
+	        // Emit the appropriate add instruction.
+	        CodeGenerator.objectFile.println("    " + type + "mul");
+	        CodeGenerator.objectFile.flush();
+        }
 
-        CodeGenerator.objectFile.println("      " + typeCode + "mul");
-        CodeGenerator.objectFile.flush();
 
         return data;
     }
@@ -172,19 +186,26 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend0Node = (SimpleNode) node.jjtGetChild(0);
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
-        // Get the addition type.
-        SymTabEntry id = (SymTabEntry) addend0Node.getAttribute(ID);
-        TypeSpec type = id.getTypeSpec();
-        
-        String typeCode = type == Predefined.integerType ? "i" : "f";     
+        String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());   
+        String type = "";
+        if(typeCode.equals("I")) {
+        	type = "i";
+        }
+        else if(typeCode.equals("F")) {
+        	type= "f";
+        }
+        else {
+        	throw new UnsupportedOperationException("Invalid type for Division");
+        }
 
-        addend0Node.jjtAccept(this, data);
-        addend1Node.jjtAccept(this, data);
-        
-        
-        // Emit the appropriate add instruction.
-        CodeGenerator.objectFile.println("    " + typeCode + "div");
-        CodeGenerator.objectFile.flush();
+        if(type == "i" || type == "f") {
+            addend0Node.jjtAccept(this, data);
+            addend1Node.jjtAccept(this, data);
+	        // Emit the appropriate add instruction.
+	        CodeGenerator.objectFile.println("    " + type + "div");
+	        CodeGenerator.objectFile.flush();
+        }
+
 
         return data;
     }    
