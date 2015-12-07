@@ -4,7 +4,7 @@ options {
     NODE_EXTENDS = "wci.intermediate.icodeimpl.ICodeNodeImpl";
     MULTI=true;
     VISITOR=true;
-    //DEBUG_PARSER=true;
+    DEBUG_PARSER=false;
 
 
 }
@@ -30,11 +30,14 @@ public class CLikeParser
 {
   	private static SymTabStack symTabStack;
   	private static SymTabEntry programId;
-  	//private static SymTabEntry functionId;  	
+  	//private static SymTabEntry functionId;
+  	private static ParseException ErrorMessage;  	
   	
     public static void main(String [] args) throws Exception
     {
-
+		try
+		{
+		  
       	//create symbol table
       	symTabStack = SymTabFactory.createSymTabStack();
       	Predefined.initialize(symTabStack);
@@ -43,6 +46,7 @@ public class CLikeParser
       	
 		//parse the program
 		Reader reader = new FileReader(sourceFilePath);
+
 		CLikeParser parser = new CLikeParser(reader);
 		SimpleNode rootNode = parser.Program();
 		//rootNode.dump(">");
@@ -66,6 +70,14 @@ public class CLikeParser
 
         Backend backend = BackendFactory.createBackend("compile");
         backend.process(iCode, symTabStack, objectFileName(sourceFilePath));
+
+		}		
+		catch(NullPointerException e)
+		{
+		  System.err.println("ERROR: INVALID SYNTAX, CHECK ABOVE FOR ERRORS");
+		  //System.out.println(ErrorMessage.getMessage());
+		}
+        
     }
 
     private static String fileNameWithoutExtension(String fileName) {
@@ -285,8 +297,12 @@ void Statement() #void :  {}
 void Assignment() : {}
 {
     identifier() {
+      try      {
         SymTabEntry variableId = symTabStack.lookup(token.image);
         variableId.appendLineNumber(token.beginLine);
+      }
+      catch (NullPointerException ex)      {		System.err.println("ERROR: VARIABLE NEVER DECLARED");
+      }
     }
     <EQUAL>
     (expression())
@@ -477,11 +493,15 @@ void String() : {}
 
 void identifier() : {}
 {
-        < IDENTIFIER >        {	        SymTabEntry variableId = symTabStack.lookup(token.image);
+        < IDENTIFIER >        {
+          try          {            	        SymTabEntry variableId = symTabStack.lookup(token.image);
 	        variableId.appendLineNumber(token.beginLine);
 	        TypeSpec type = variableId.getTypeSpec();
 	        jjtThis.setTypeSpec(type);
 	        jjtThis.setAttribute(ID, variableId);
+	      }
+	      catch(NullPointerException ex)	      {				System.err.println("ERROR:VARIABLE NEVER DECLARED");
+	      }
         }
 }
 
@@ -510,13 +530,14 @@ JAVACODE
 String handleError(ParseException ex) #void
 {
     Token token = ex.currentToken;
-    System.out.println(ex.getMessage());
+    ErrorMessage = ex;
+    System.err.println(ex.getMessage());
 
     do {
     	token = getNextToken();
-    } while (token.kind != SEMICOLON);
+    } while (token.kind != EOF);
 
-	//jjtree.popNode();
+	jjtree.popNode();
     return token.image;
 }
 
