@@ -1,26 +1,16 @@
-//string hello;
-
-//hello = "hello" + "hel";
-
-string i,j,k;
-
-i = "hello";
-j = " world";
-//k = "this is a test";
-
-i = i + j;
-
-println(i);
-
 int a,b,c;
-a = 4;
-b = 6;
-c = 10;
 
-a = a + b;
+a = 1;
+b = 2;
+c = 3;
 
-println(a);
-
-
-
-
+if (a == 1) {
+	if (b == 2) {
+		if (c == 3) {
+			a = a + b;
+			a = a + c;
+			println(a);
+		}
+	
+	}
+}

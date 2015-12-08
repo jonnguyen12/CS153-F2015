@@ -350,37 +350,39 @@ public Object visit(ASTidentifier node, Object data) {
     		// if A < B push -1 on stack   [B,A]
     		//boolOpString = "fcmpl \n";
     		// iflt pops the top int off the operand stack. If the int is less than zero
-    		boolOpString += "if_icmplt "+label_suffix + ++label_count;
+    		boolOpString += "if_icmplt "+label_suffix + label_count++;
     	}
     	else if(op.equals("greater_than")) {
     		//boolOpString = "fcmpg \n"; // pushes 1 if A > b
     		// branches if val > 0 
-    		boolOpString += "if_icmpgt "+label_suffix + ++label_count;
+    		boolOpString += "if_icmpgt "+label_suffix + label_count++;
     	}
     	else if(op.equals("less_than_or_equals")) {
     		//boolOpString = "fcmpl \n";
-    		boolOpString += "if_icmple "+label_suffix + ++label_count;
+    		boolOpString += "if_icmple "+label_suffix + label_count++;
     	}
     	else if(op.equals("greater_than_or_equals")) {
     		//boolOpString = "fcmpg \n";
-    		boolOpString += "if_icmpge "+label_suffix+ ++label_count;
+    		boolOpString += "if_icmpge "+label_suffix+ label_count++;
     	}
     	else if(op.equals("equality")) {
     		System.out.println("equality op");
     		//boolOpString = "fcmpg \n";
-    		boolOpString += "if_icmpeq "+label_suffix+ ++label_count;
+    		boolOpString += "if_icmpeq "+label_suffix+ label_count++;
     	}
     	else if(op.equals("not_equals")) {
     		//boolOpString = "fcmpg \n";
-    		boolOpString += "if_icmpne "+label_suffix+ ++label_count;
+    		boolOpString += "if_icmpne "+label_suffix+ label_count++;
     	}
     	CodeGenerator.objectFile.println(boolOpString);
 
     	//CodeGenerator.objectFile.println("       iconst_0");
     	SimpleNode op_node = (SimpleNode) node;
     	System.out.println("IS WHILE: "+op_node.getAttribute(IS_WHILE));
-    	if( ! (boolean) op_node.getAttribute(IS_WHILE))
-    		CodeGenerator.objectFile.println("       goto " +label_suffix + ++label_count);
+    	if( ! (boolean) op_node.getAttribute(IS_WHILE)) {
+    		int newLabel = label_count+1;
+    		CodeGenerator.objectFile.println("       goto " +label_suffix + newLabel);
+    	}
     	return data;
     }    
     
@@ -412,7 +414,7 @@ public Object visit(ASTidentifier node, Object data) {
     	CodeGenerator.objectFile.println(label_suffix  + (preLabel) + ":");
     	branch1.jjtAccept(this, data);
     	// skip all the else
-    	CodeGenerator.objectFile.println("       goto " +label_suffix + (1+label_count));
+    	//CodeGenerator.objectFile.println("       goto " +label_suffix + (1+label_count));
 
     	
     	CodeGenerator.objectFile.println(label_suffix +  + (label_count) + ":");
@@ -435,7 +437,7 @@ public Object visit(ASTidentifier node, Object data) {
     	if(node.jjtGetNumChildren() > 0) {
 	    	SimpleNode body = (SimpleNode) node.jjtGetChild(0);
 	    	body.jjtAccept(this, data);
-    	}
+    	}   	
     	return data;
     }
     
