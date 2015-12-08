@@ -283,12 +283,6 @@ void Statement() #void :  {}
 	|{System.out.println("=PARSING WHILE LOOP=");}
 	whileLoop()
 	{System.out.println("=ENDING WHILE LOOP=");}
-    | {System.out.println("=PARSING RETURN STATEMENT=");}
-      returnStatement()
-      {System.out.println("=END RETURN STATEMENT=");}
-    | {System.out.println("=PARSING FOR LOOP=");}
-      forLoop()
-      {System.out.println("=END FOR LOOP=");}
     | println()      
 
 	
@@ -305,7 +299,7 @@ void Assignment() : {}
       }
     }
     <EQUAL>
-    (expression())
+    expression()
     < SEMICOLON >
 }
 
@@ -393,7 +387,7 @@ void paramaterList() #void : {}
 	(expression() (<COMMA > expression())*)*
 }
 
-//statments such as (z++;, z*z;)
+//statments such as (z*z;)
 void SimpleStatement() : {}
 {
 	expression() < SEMICOLON >
@@ -407,8 +401,28 @@ void IfStatment() : {}
 
 void If_Part() #void: {}
 {
-  < IF > <LEFT_PAREN > expression() < RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+  < IF > <LEFT_PAREN > condition() < RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
+
+void condition() : {}
+{
+	<LEFT_PAREN>
+	(expression() (boolean_op() expression())? )
+	<RIGHT_PAREN>
+	
+}
+
+void boolean_op() : {jjtThis.setAttribute(IS_WHILE, false);}
+{
+	<LT> #less_than |
+	<GT> #greater_than |
+	<LTE> #less_than_or_equals |
+	<GTE> #greater_than_or_equals |
+	<EQUAL_BOOL> #equality |
+	<NOT_EQUAL> #not_equals
+
+}
+
 
 void Else_Part() #void: {}
 {
@@ -420,20 +434,7 @@ void whileLoop() : {}
   < WHILE > <LEFT_PAREN > expression() < RIGHT_PAREN > <LEFT_BRACKET> Statements() < RIGHT_BRACKET >
 }
 
-void forLoop() : {}
-{
-	< FOR ><LEFT_PAREN >  expression()< SEMICOLON > forInc()< RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
-}
-//need to add support for statments like i = i+1
-void forInc() #void : {}
-{
-	< IDENTIFIER > (incOrDec())
-}
 
-void returnStatement() : {}
-{
-	< RETURN > expression() < SEMICOLON >
-}
 
 
 void DataType()#void:{}
@@ -449,19 +450,6 @@ void DataType()#void:{}
 void println() : {}
 {
     <PRINTLN> <LEFT_PAREN> factor() <RIGHT_PAREN> <SEMICOLON>
-}
-
-
-void Operators() #void: {}
-{
-	< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE > | < EQUAL_BOOL > | < GT > | < LT > | < LTE > | < GTE > | < AND > | < OR >
-}
-
-
-
-void incOrDec() #void: {}
-{
-	(< INC > | < DEC >)?
 }
 
 

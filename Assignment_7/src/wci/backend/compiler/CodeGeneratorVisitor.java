@@ -20,8 +20,7 @@ public class CodeGeneratorVisitor
         SymTabEntry id = (SymTabEntry) variableNode.getAttribute(ID);
         String fieldName = id.getName();
         TypeSpec type = id.getTypeSpec();
-        String typeCode = TypeCode.typeSpecToTypeCode(type);
-
+        String typeCode = TypeCode.typeSpecToTypeCode(type);     
         // Emit the appropriate store instruction.
         CodeGenerator.objectFile.println("      putstatic " + CodeGenerator.PROGRAM_HEADER_CLASS_NAME +
                 "/" + fieldName + " " + typeCode);
@@ -92,7 +91,13 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
 
-        String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());   
+        String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());  
+        String typeCode2 = TypeCode.typeSpecToTypeCode(addend1Node.getTypeSpec());
+        if(!typeCode.equals(typeCode2)) {
+        	System.err.println("ERROR: TYPEMISSMATCH,TRYING TO MATCH TYPE: "+ typeCode + " to Type " + typeCode2);
+        	typeCode = "ERROR";
+        
+        }               
         String type = "";
         if(typeCode.equals("I")) {
         	type = "i";
@@ -122,8 +127,8 @@ public Object visit(ASTidentifier node, Object data) {
         	CodeGenerator.objectFile.println("       invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
         	CodeGenerator.objectFile.println("       invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");        	
         }
-
         return data;
+
     }
 
     public Object visit(ASTsubtract node, Object data)
@@ -132,7 +137,13 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
 
-        String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());   
+        String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());
+        String typeCode2 = TypeCode.typeSpecToTypeCode(addend1Node.getTypeSpec());
+        if(!typeCode.equals(typeCode2)) {
+        	System.err.println("ERROR: TYPEMISSMATCH,TRYING TO MATCH TYPE: "+ typeCode + " to Type " + typeCode2);
+        	typeCode = "ERROR";
+        
+        }        
         String type = "";
         if(typeCode.equals("I")) {
         	type = "i";
@@ -159,6 +170,13 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
         String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());   
+        String typeCode2 = TypeCode.typeSpecToTypeCode(addend1Node.getTypeSpec()); 
+        //type check
+        if(!typeCode.equals(typeCode2)) {
+        	System.err.println("ERROR: TYPEMISSMATCH,TRYING TO MATCH TYPE: "+ typeCode + " to Type " + typeCode2);
+        	typeCode = "ERROR";
+        
+        }
         String type = "";
         if(typeCode.equals("I")) {
         	type = "i";
@@ -187,6 +205,12 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
         String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());   
+        String typeCode2 = TypeCode.typeSpecToTypeCode(addend1Node.getTypeSpec());
+        if(!typeCode.equals(typeCode2)) {
+        	System.err.println("ERROR: TYPEMISSMATCH,TRYING TO MATCH TYPE: "+ typeCode + " to Type " + typeCode2);
+        	typeCode = "ERROR";
+        
+        }                 
         String type = "";
         if(typeCode.equals("I")) {
         	type = "i";
