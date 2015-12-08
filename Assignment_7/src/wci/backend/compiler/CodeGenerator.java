@@ -20,6 +20,7 @@ import java.util.List;
 public class CodeGenerator extends Backend
 {
     private static final int STACK_LIMIT = 16;
+    private static final int LOCALS_LIMIT = 64;    
     public static final String PROGRAM_HEADER_CLASS_NAME = "CLikeProgram";
 
     static ICode iCode;
@@ -59,7 +60,7 @@ public class CodeGenerator extends Backend
         writeMainMethodHeader();
         writeMainMethodBody();
         // TODO Count the locals.
-        //objectFile.println(".limit locals " + localsCount);
+        objectFile.println(".limit locals " + LOCALS_LIMIT);
         objectFile.println(".limit stack " + STACK_LIMIT);
         objectFile.println(".end method");
     }

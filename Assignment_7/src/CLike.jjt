@@ -396,20 +396,21 @@ void SimpleStatement() : {}
 
 void IfStatment() : {}
 {
-	If_Part() (Else_Part())?
+	If_Part()
 }
 
-void If_Part() #void: {}
+void If_Part(): {}
 {
-  < IF > <LEFT_PAREN > condition() < RIGHT_PAREN > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
+  < IF > <LEFT_PAREN > condition() < RIGHT_PAREN > If_Body()
+}
+
+void If_Body() : {}
+{Compound_Statment()
 }
 
 void condition() : {}
 {
-	<LEFT_PAREN>
-	(expression() (boolean_op() expression())? )
-	<RIGHT_PAREN>
-	
+	(factor() (boolean_op() factor())? )
 }
 
 void boolean_op() : {jjtThis.setAttribute(IS_WHILE, false);}
@@ -421,12 +422,6 @@ void boolean_op() : {jjtThis.setAttribute(IS_WHILE, false);}
 	<EQUAL_BOOL> #equality |
 	<NOT_EQUAL> #not_equals
 
-}
-
-
-void Else_Part() #void: {}
-{
-  < ELSE > <LEFT_BRACKET > Statements() < RIGHT_BRACKET >
 }
 
 void whileLoop() : {}
@@ -445,6 +440,11 @@ void DataType()#void:{}
 	| < STRING_TYPE > 
 	
 
+}
+
+void Compound_Statment() : {}
+{
+  	<LEFT_BRACKET> Statements() <RIGHT_BRACKET>
 }
 
 void println() : {}

@@ -2,11 +2,14 @@ package wci.intermediate;
 
 
 import wci.frontend.ASTAssignment;
+import wci.frontend.ASTCompound_Statment;
 import wci.frontend.ASTDataType;
 import wci.frontend.ASTExpression;
 import wci.frontend.ASTFunctionCall;
 import wci.frontend.ASTFunctionDeclaration;
 import wci.frontend.ASTIfStatment;
+import wci.frontend.ASTIf_Body;
+import wci.frontend.ASTIf_Part;
 import wci.frontend.ASTOperators;
 import wci.frontend.ASTProgram;
 import wci.frontend.ASTSimpleStatement;
@@ -193,6 +196,24 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 
 	@Override
 	public Object visit(ASTnot_equals node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTIf_Part node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTIf_Body node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTCompound_Statment node, Object data) {
 		// TODO Auto-generated method stub
 		return node.childrenAccept(this, data);
 	}
