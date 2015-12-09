@@ -12,6 +12,8 @@ public class CodeGeneratorVisitor
 {
 	//labels for looping and conditions
 	int label_count = 0;
+	int empty_count = 0;
+	int loop_count = 0;
 	String label_suffix = "Label";
 
     public Object visit(ASTAssignment node, Object data) {
@@ -95,13 +97,8 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
 
-        String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());  
-        String typeCode2 = TypeCode.typeSpecToTypeCode(addend1Node.getTypeSpec());
-        if(!typeCode.equals(typeCode2)) {
-        	System.err.println("ERROR: TYPEMISSMATCH,TRYING TO MATCH TYPE: "+ typeCode + " to Type " + typeCode2);
-        	typeCode = "ERROR";
-        
-        }               
+        String typeCode = TypeCode.typeSpecToTypeCode(addend1Node.getTypeSpec());  
+        String typeCode2 = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());           
         String type = "";
         if(typeCode.equals("I")) {
         	type = "i";
@@ -112,7 +109,12 @@ public Object visit(ASTidentifier node, Object data) {
         else if (typeCode.equals("Ljava/lang/String;")) {
         	type = "c";
         }
-
+        else if(typeCode2.equals("more")) {
+            addend1Node.jjtAccept(this, data);           	
+        }
+        else if(typeCode.equals("more")) {
+            addend0Node.jjtAccept(this, data);           	
+        }    
         if(type == "i" || type == "f") {
             addend0Node.jjtAccept(this, data);
             addend1Node.jjtAccept(this, data);
@@ -131,8 +133,11 @@ public Object visit(ASTidentifier node, Object data) {
         	CodeGenerator.objectFile.println("       invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
         	CodeGenerator.objectFile.println("       invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");        	
         }
+        //not terminal (more +,-,/,*)
+        else {
+            addend1Node.jjtAccept(this, data);   
+        }
         return data;
-
     }
 
     public Object visit(ASTsubtract node, Object data)
@@ -141,13 +146,8 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
 
-        String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());
-        String typeCode2 = TypeCode.typeSpecToTypeCode(addend1Node.getTypeSpec());
-        if(!typeCode.equals(typeCode2)) {
-        	System.err.println("ERROR: TYPEMISSMATCH,TRYING TO MATCH TYPE: "+ typeCode + " to Type " + typeCode2);
-        	typeCode = "ERROR";
-        
-        }        
+        String typeCode = TypeCode.typeSpecToTypeCode(addend1Node.getTypeSpec());  
+        String typeCode2 = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());           
         String type = "";
         if(typeCode.equals("I")) {
         	type = "i";
@@ -155,16 +155,22 @@ public Object visit(ASTidentifier node, Object data) {
         else if(typeCode.equals("F")) {
         	type= "f";
         }
-        else {
-        	throw new UnsupportedOperationException("Invalid type for Subtraction");
+        else if(typeCode2.equals("more")) {
+            addend1Node.jjtAccept(this, data);           	
         }
+        else if(typeCode.equals("more")) {
+           addend0Node.jjtAccept(this, data);           	
+        }        
+
         if(type == "i" || type == "f") {
             addend0Node.jjtAccept(this, data);
             addend1Node.jjtAccept(this, data);
-	        // Emit the appropriate add instruction.
+	        // Emit the appropriate sub instruction.
 	        CodeGenerator.objectFile.println("    " + type + "sub");
 	        CodeGenerator.objectFile.flush();
         }
+        //not terminal (more +,-,/,*)
+
         return data;
     }
 
@@ -173,14 +179,9 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend0Node = (SimpleNode) node.jjtGetChild(0);
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
-        String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());   
-        String typeCode2 = TypeCode.typeSpecToTypeCode(addend1Node.getTypeSpec()); 
-        //type check
-        if(!typeCode.equals(typeCode2)) {
-        	System.err.println("ERROR: TYPEMISSMATCH,TRYING TO MATCH TYPE: "+ typeCode + " to Type " + typeCode2);
-        	typeCode = "ERROR";
-        
-        }
+
+        String typeCode = TypeCode.typeSpecToTypeCode(addend1Node.getTypeSpec());  
+        String typeCode2 = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());           
         String type = "";
         if(typeCode.equals("I")) {
         	type = "i";
@@ -188,17 +189,21 @@ public Object visit(ASTidentifier node, Object data) {
         else if(typeCode.equals("F")) {
         	type= "f";
         }
-        else {
-        	throw new UnsupportedOperationException("Invalid type for Multiplucation");
+        else if(typeCode2.equals("more")) {
+            addend1Node.jjtAccept(this, data);           	
         }
+        else if(typeCode.equals("more")) {
+           addend0Node.jjtAccept(this, data);           	
+        }        
+
         if(type == "i" || type == "f") {
             addend0Node.jjtAccept(this, data);
             addend1Node.jjtAccept(this, data);
-	        // Emit the appropriate add instruction.
+	        // Emit the appropriate sub instruction.
 	        CodeGenerator.objectFile.println("    " + type + "mul");
 	        CodeGenerator.objectFile.flush();
         }
-
+        //not terminal (more +,-,/,*)
 
         return data;
     }
@@ -208,13 +213,9 @@ public Object visit(ASTidentifier node, Object data) {
         SimpleNode addend0Node = (SimpleNode) node.jjtGetChild(0);
         SimpleNode addend1Node = (SimpleNode) node.jjtGetChild(1);
 
-        String typeCode = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());   
-        String typeCode2 = TypeCode.typeSpecToTypeCode(addend1Node.getTypeSpec());
-        if(!typeCode.equals(typeCode2)) {
-        	System.err.println("ERROR: TYPEMISSMATCH,TRYING TO MATCH TYPE: "+ typeCode + " to Type " + typeCode2);
-        	typeCode = "ERROR";
-        
-        }                 
+
+        String typeCode = TypeCode.typeSpecToTypeCode(addend1Node.getTypeSpec());  
+        String typeCode2 = TypeCode.typeSpecToTypeCode(addend0Node.getTypeSpec());           
         String type = "";
         if(typeCode.equals("I")) {
         	type = "i";
@@ -222,18 +223,21 @@ public Object visit(ASTidentifier node, Object data) {
         else if(typeCode.equals("F")) {
         	type= "f";
         }
-        else {
-        	throw new UnsupportedOperationException("Invalid type for Division");
+        else if(typeCode2.equals("more")) {
+            addend1Node.jjtAccept(this, data);           	
         }
+        else if(typeCode.equals("more")) {
+           addend0Node.jjtAccept(this, data);           	
+        }        
 
         if(type == "i" || type == "f") {
             addend0Node.jjtAccept(this, data);
             addend1Node.jjtAccept(this, data);
-	        // Emit the appropriate add instruction.
+	        // Emit the appropriate sub instruction.
 	        CodeGenerator.objectFile.println("    " + type + "div");
 	        CodeGenerator.objectFile.flush();
         }
-
+        //not terminal (more +,-,/,*)
 
         return data;
     }    
@@ -350,29 +354,29 @@ public Object visit(ASTidentifier node, Object data) {
     		// if A < B push -1 on stack   [B,A]
     		//boolOpString = "fcmpl \n";
     		// iflt pops the top int off the operand stack. If the int is less than zero
-    		boolOpString += "if_icmplt "+label_suffix + label_count++;
+    		boolOpString += "if_icmplt "+label_suffix + ++label_count;
     	}
     	else if(op.equals("greater_than")) {
     		//boolOpString = "fcmpg \n"; // pushes 1 if A > b
     		// branches if val > 0 
-    		boolOpString += "if_icmpgt "+label_suffix + label_count++;
+    		boolOpString += "if_icmpgt "+label_suffix + ++label_count;
     	}
     	else if(op.equals("less_than_or_equals")) {
     		//boolOpString = "fcmpl \n";
-    		boolOpString += "if_icmple "+label_suffix + label_count++;
+    		boolOpString += "if_icmple "+label_suffix + ++label_count;
     	}
     	else if(op.equals("greater_than_or_equals")) {
     		//boolOpString = "fcmpg \n";
-    		boolOpString += "if_icmpge "+label_suffix+ label_count++;
+    		boolOpString += "if_icmpge "+label_suffix+ ++label_count;
     	}
     	else if(op.equals("equality")) {
     		System.out.println("equality op");
     		//boolOpString = "fcmpg \n";
-    		boolOpString += "if_icmpeq "+label_suffix+ label_count++;
+    		boolOpString += "if_icmpeq "+label_suffix+ ++label_count;
     	}
     	else if(op.equals("not_equals")) {
     		//boolOpString = "fcmpg \n";
-    		boolOpString += "if_icmpne "+label_suffix+ label_count++;
+    		boolOpString += "if_icmpne "+label_suffix+ ++label_count;
     	}
     	CodeGenerator.objectFile.println(boolOpString);
 
@@ -410,14 +414,14 @@ public Object visit(ASTidentifier node, Object data) {
     	SimpleNode condition = (SimpleNode) node.jjtGetChild(0).jjtGetChild(0);
     	SimpleNode branch1 = (SimpleNode) node.jjtGetChild(0).jjtGetChild(1);
     	condition.jjtAccept(this, data); //parse condition set labels 
-    	int preLabel = label_count -1;
+    	int preLabel = label_count;
     	CodeGenerator.objectFile.println(label_suffix  + (preLabel) + ":");
     	branch1.jjtAccept(this, data);
     	// skip all the else
     	//CodeGenerator.objectFile.println("       goto " +label_suffix + (1+label_count));
 
     	
-    	CodeGenerator.objectFile.println(label_suffix +  + (label_count) + ":");
+    	//CodeGenerator.objectFile.println(label_suffix +  + (label_count) + ":");
 
     	//check for else part for now
     	//int numbOfChildren = node.jjtGetNumChildren();
@@ -440,5 +444,23 @@ public Object visit(ASTidentifier node, Object data) {
     	}   	
     	return data;
     }
-    
+    public Object visit(ASTwhileLoop node, Object data) {
+    	System.out.println("WHILE has "+node.jjtGetNumChildren());
+    	SimpleNode condition = (SimpleNode) node.jjtGetChild(0);
+    	
+    	CodeGenerator.objectFile.println("loop" + loop_count++ + ": ");
+
+    	((SimpleNode) condition.jjtGetChild(1)).setAttribute(IS_WHILE, true);
+    	condition.jjtAccept(this, data);
+//    	generate_code_for_while_condition(condition, data);
+    	
+    	CodeGenerator.objectFile.println("goto "+"Empty"+ empty_count++);
+    	CodeGenerator.objectFile.println(label_suffix+(label_count)+":");
+    	SimpleNode body = (SimpleNode) node.jjtGetChild(1);
+    	body.jjtAccept(this, data);
+    	//CodeGenerator.objectFile.println("goto "+label_suffix+label_count);
+    	CodeGenerator.objectFile.println("goto loop" + --loop_count);
+    	CodeGenerator.objectFile.println("Empty"+ (--empty_count) +":");
+    	return data;
+    }    
 }

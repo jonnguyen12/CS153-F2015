@@ -19,7 +19,7 @@ public class TypeCode {
             return INTEGER_TYPECODE;
         }        
         else {
-            throw new UnsupportedOperationException("That type is not yet implemented in the code generator!");
+            return "more";
         }
     }
 }

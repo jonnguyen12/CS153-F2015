@@ -298,7 +298,7 @@ void Assignment() : {}
       catch (NullPointerException ex)      {		System.err.println("ERROR: VARIABLE NEVER DECLARED");
       }
     }
-    <EQUAL>
+    < EQUAL >
     expression()
     < SEMICOLON >
 }
@@ -426,7 +426,7 @@ void boolean_op() : {jjtThis.setAttribute(IS_WHILE, false);}
 
 void whileLoop() : {}
 {
-  < WHILE > <LEFT_PAREN > expression() < RIGHT_PAREN > <LEFT_BRACKET> Statements() < RIGHT_BRACKET >
+  < WHILE > <LEFT_PAREN > condition() < RIGHT_PAREN > Compound_Statment()
 }
 
 
