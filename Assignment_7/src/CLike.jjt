@@ -131,7 +131,8 @@ TOKEN : {
  	{ debugStream.println("DEFINE token: " + matchedToken.image); }
    	| <END : "end">
  	{ debugStream.println("END token: " + matchedToken.image); }
- 	| <PRINTLN : "println">	  	 	  	 		
+ 	| <PRINTLN : "printf">
+ 	| <CIN : "cin">	 		  	 		
 
 }
 //Special Symbols
@@ -283,7 +284,8 @@ void Statement() #void :  {}
 	|{System.out.println("=PARSING WHILE LOOP=");}
 	whileLoop()
 	{System.out.println("=ENDING WHILE LOOP=");}
-    | println()      
+    | println()
+    | userInput()   
 
 	
 }
@@ -451,6 +453,12 @@ void println() : {}
 {
     <PRINTLN> <LEFT_PAREN> factor() <RIGHT_PAREN> <SEMICOLON>
 }
+
+void userInput() : {}
+{
+    <CIN> <LEFT_PAREN> identifier() <RIGHT_PAREN> <SEMICOLON>
+}
+
 
 
 void integerConstant() : {}

@@ -34,6 +34,7 @@ import wci.frontend.ASTprintln;
 import wci.frontend.ASTrealConstant;
 import wci.frontend.ASTreturnStatement;
 import wci.frontend.ASTsubtract;
+import wci.frontend.ASTuserInput;
 import wci.frontend.ASTvariableDeclaration;
 import wci.frontend.ASTwhileLoop;
 import wci.frontend.CLikeParserVisitor;
@@ -214,6 +215,12 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 
 	@Override
 	public Object visit(ASTCompound_Statment node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTuserInput node, Object data) {
 		// TODO Auto-generated method stub
 		return node.childrenAccept(this, data);
 	}

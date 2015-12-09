@@ -251,7 +251,40 @@ public Object visit(ASTidentifier node, Object data) {
     	}
     	System.out.println("EXITED COMPOUND STMT");
     	return data;
-    }   
+    }  
+    
+    public Object visit(ASTuserInput node, Object data) {
+        SimpleNode nodeToPrint = (SimpleNode) node.jjtGetChild(0);
+        String typePrefix = TypeCode.typeSpecToTypeCode(nodeToPrint.getTypeSpec());    	
+        SimpleNode addend0Node = (SimpleNode) node.jjtGetChild(0);        
+        SymTabEntry id = (SymTabEntry) addend0Node.getAttribute(ID);    	
+        
+        CodeGenerator.objectFile.println("       new java/util/Scanner");
+        CodeGenerator.objectFile.println("       dup");
+        CodeGenerator.objectFile.println("       getstatic java/lang/System/in Ljava/io/InputStream;");
+        CodeGenerator.objectFile.println("       invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V");
+        
+        if(typePrefix.equals("F")) {
+            CodeGenerator.objectFile.println("       invokevirtual java/util/Scanner/nextFloat()F");
+            CodeGenerator.objectFile.println("       putstatic CLikeProgram/" + id.getName() + " F");
+        }
+        else if(typePrefix.equals("I")) {
+            CodeGenerator.objectFile.println("       invokevirtual java/util/Scanner/nextInt()I");
+            CodeGenerator.objectFile.println("       putstatic CLikeProgram/" + id.getName() + " I");
+        }      
+      
+        else if(typePrefix.equals("Ljava/lang/String;")) {
+            CodeGenerator.objectFile.println("       invokevirtual java/util/Scanner/nextLine()Ljava/lang/String;");
+            CodeGenerator.objectFile.println("       putstatic CLikeProgram/" + id.getName() + " Ljava/lang/String;");
+        }
+        else {
+        	throw new IllegalArgumentException("That data type is not supported for user input.");
+        }        
+        
+        
+    	return data;
+    }
+    
     
     public Object visit(ASTprintln node, Object data) {
 

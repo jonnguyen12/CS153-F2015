@@ -1,16 +1,12 @@
-int a,b,c;
 
-a = 1;
-b = 2;
-c = 3;
+string a,b,c;
+printf("== ENTER 3 STRING TO CONCATINATE ==");
+printf("== STRING 1 ==");
+cin(a);
+printf("== STRING 2 ==");
+cin(b);
+printf("== STRING 3 ==");
+cin(c);
 
-if (a == 1) {
-	if (b == 2) {
-		if (c == 3) {
-			a = a + b;
-			a = a + c;
-			println(a);
-		}
-	
-	}
-}
+a = a +" "+ b +" "+ c;
+printf(a);
