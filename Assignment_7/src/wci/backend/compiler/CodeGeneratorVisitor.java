@@ -50,8 +50,6 @@ public Object visit(ASTidentifier node, Object data) {
     else if (typeCode.equals("Ljava/lang/String;")) {
     	type = "Ljava/lang/String;";
     }    
-    //String typeCode = type == Predefined.integerType ? "I" : "F";
-
     // Emit the appropriate load instruction.
     CodeGenerator.objectFile.println("    getstatic " + CodeGenerator.PROGRAM_HEADER_CLASS_NAME +
             "/" + fieldName + " " + type);
@@ -243,15 +241,26 @@ public Object visit(ASTidentifier node, Object data) {
     }    
 
     public Object visit(ASTCompound_Statment node, Object data) {
-    	System.out.println("VISITED COMPUND STMT");
     	for(int i = 0; i < node.jjtGetNumChildren(); i++) {
     		SimpleNode curr = (SimpleNode) node.jjtGetChild(i);
     		curr.jjtAccept(this, data);
-    		System.out.println(i);
     	}
-    	System.out.println("EXITED COMPOUND STMT");
     	return data;
     }  
+    
+    public Object visit(ASTrandInt node, Object data) {
+        SimpleNode addend0Node = (SimpleNode) node.jjtGetChild(0);        
+
+        CodeGenerator.objectFile.println("       new java/util/Random");
+        CodeGenerator.objectFile.println("       dup");
+        CodeGenerator.objectFile.println("       invokespecial java/util/Random/<init>()V");  
+        addend0Node.jjtAccept(this, data);
+        CodeGenerator.objectFile.println("       invokevirtual java/util/Random/nextInt(I)I");        
+        
+        
+    	return data;
+    }      
+    
     
     public Object visit(ASTuserInput node, Object data) {
         SimpleNode nodeToPrint = (SimpleNode) node.jjtGetChild(0);
@@ -381,41 +390,28 @@ public Object visit(ASTidentifier node, Object data) {
     	String boolOpString = "       ";
     	SimpleNode opNode = (SimpleNode) node.jjtGetChild(0);
     	String op = opNode.toString();
-    	System.out.println("OP "+op);
-        System.out.println(opNode);
     	if(op.equals("less_than")) {
-    		// if A < B push -1 on stack   [B,A]
-    		//boolOpString = "fcmpl \n";
-    		// iflt pops the top int off the operand stack. If the int is less than zero
     		boolOpString += "if_icmplt "+label_suffix + ++label_count;
     	}
     	else if(op.equals("greater_than")) {
-    		//boolOpString = "fcmpg \n"; // pushes 1 if A > b
-    		// branches if val > 0 
     		boolOpString += "if_icmpgt "+label_suffix + ++label_count;
     	}
     	else if(op.equals("less_than_or_equals")) {
-    		//boolOpString = "fcmpl \n";
     		boolOpString += "if_icmple "+label_suffix + ++label_count;
     	}
     	else if(op.equals("greater_than_or_equals")) {
-    		//boolOpString = "fcmpg \n";
     		boolOpString += "if_icmpge "+label_suffix+ ++label_count;
     	}
     	else if(op.equals("equality")) {
-    		System.out.println("equality op");
-    		//boolOpString = "fcmpg \n";
     		boolOpString += "if_icmpeq "+label_suffix+ ++label_count;
     	}
     	else if(op.equals("not_equals")) {
-    		//boolOpString = "fcmpg \n";
     		boolOpString += "if_icmpne "+label_suffix+ ++label_count;
     	}
     	CodeGenerator.objectFile.println(boolOpString);
 
     	//CodeGenerator.objectFile.println("       iconst_0");
     	SimpleNode op_node = (SimpleNode) node;
-    	System.out.println("IS WHILE: "+op_node.getAttribute(IS_WHILE));
     	if( ! (boolean) op_node.getAttribute(IS_WHILE)) {
     		int newLabel = label_count+1;
     		CodeGenerator.objectFile.println("       goto " +label_suffix + newLabel);
@@ -429,16 +425,12 @@ public Object visit(ASTidentifier node, Object data) {
     	SimpleNode exp2 = (SimpleNode) node.jjtGetChild(2);
     	
     	exp1.jjtAccept(this, data); //generate expression code 
-    	// fsore_0
     	CodeGenerator.objectFile.println("       istore_0");
     	exp2.jjtAccept(this, data); // generate expression code
-    	//fsore_1
     	CodeGenerator.objectFile.println("       istore_1");
-    	//load B
     	CodeGenerator.objectFile.println("       iload_0");
-    	//load A
     	CodeGenerator.objectFile.println("       iload_1");
-    	op.jjtAccept(this, data); //  [B,A] create a branch if_icmplt L003  ; branch if i < j
+    	op.jjtAccept(this, data);
     	return data;
     }    
     
@@ -450,21 +442,7 @@ public Object visit(ASTidentifier node, Object data) {
     	int preLabel = label_count;
     	CodeGenerator.objectFile.println(label_suffix  + (preLabel) + ":");
     	branch1.jjtAccept(this, data);
-    	// skip all the else
-    	//CodeGenerator.objectFile.println("       goto " +label_suffix + (1+label_count));
 
-    	
-    	//CodeGenerator.objectFile.println(label_suffix +  + (label_count) + ":");
-
-    	//check for else part for now
-    	//int numbOfChildren = node.jjtGetNumChildren();
-    	//if(numbOfChildren > 1) // not a single if statement
-    	//{
-    	//	for(int i = 1; i < numbOfChildren; i++ ) {
-    	//		SimpleNode ifChild = (SimpleNode) node.jjtGetChild(i);
-    	//		ifChild.jjtAccept(this, data);
-    	//	}
-    	//}
     	CodeGenerator.objectFile.println(label_suffix +  + (++label_count) + ":");
 
     	return data;
@@ -478,20 +456,17 @@ public Object visit(ASTidentifier node, Object data) {
     	return data;
     }
     public Object visit(ASTwhileLoop node, Object data) {
-    	System.out.println("WHILE has "+node.jjtGetNumChildren());
     	SimpleNode condition = (SimpleNode) node.jjtGetChild(0);
-    	
     	CodeGenerator.objectFile.println("loop" + loop_count++ + ": ");
 
     	((SimpleNode) condition.jjtGetChild(1)).setAttribute(IS_WHILE, true);
     	condition.jjtAccept(this, data);
-//    	generate_code_for_while_condition(condition, data);
-    	
+
     	CodeGenerator.objectFile.println("goto "+"Empty"+ empty_count++);
     	CodeGenerator.objectFile.println(label_suffix+(label_count)+":");
     	SimpleNode body = (SimpleNode) node.jjtGetChild(1);
     	body.jjtAccept(this, data);
-    	//CodeGenerator.objectFile.println("goto "+label_suffix+label_count);
+
     	CodeGenerator.objectFile.println("goto loop" + --loop_count);
     	CodeGenerator.objectFile.println("Empty"+ (--empty_count) +":");
     	return data;

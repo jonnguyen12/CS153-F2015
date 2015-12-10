@@ -31,6 +31,7 @@ import wci.frontend.ASTless_than_or_equals;
 import wci.frontend.ASTmultiply;
 import wci.frontend.ASTnot_equals;
 import wci.frontend.ASTprintln;
+import wci.frontend.ASTrandInt;
 import wci.frontend.ASTrealConstant;
 import wci.frontend.ASTreturnStatement;
 import wci.frontend.ASTsubtract;
@@ -69,17 +70,6 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 		return node.childrenAccept(this, data);
 	}
 
-	@Override
-	public Object visit(ASTFunctionDeclaration node, Object data) {
-		// TODO Auto-generated method stub
-		return node.childrenAccept(this, data);
-	}
-
-	@Override
-	public Object visit(ASTFunctionCall node, Object data) {
-		// TODO Auto-generated method stub
-		return node.childrenAccept(this, data);
-	}
 
 	@Override
 	public Object visit(ASTSimpleStatement node, Object data) {
@@ -221,6 +211,12 @@ public class CLikeVisitorAdapter implements CLikeParserVisitor
 
 	@Override
 	public Object visit(ASTuserInput node, Object data) {
+		// TODO Auto-generated method stub
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTrandInt node, Object data) {
 		// TODO Auto-generated method stub
 		return node.childrenAccept(this, data);
 	}

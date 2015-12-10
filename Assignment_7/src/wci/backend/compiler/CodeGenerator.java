@@ -43,35 +43,12 @@ public class CodeGenerator extends Backend
         this.symTabStack = symTabStack;
         objectFile = new PrintWriter(objectFilePath);
 
-        writeProgramClassInfo();
-        writeMainMethod();
-
-        objectFile.flush();
-        objectFile.close();
-    }
-
-    private void writeProgramClassInfo() {
-        writeProgramHeader();
-        writeLocalVarFields();
-        writeProgramClassConstructor();
-    }
-
-    private void writeMainMethod() {
-        writeMainMethodHeader();
-        writeMainMethodBody();
-        // TODO Count the locals.
-        objectFile.println(".limit locals " + LOCALS_LIMIT);
-        objectFile.println(".limit stack " + STACK_LIMIT);
-        objectFile.println(".end method");
-    }
-
-    private void writeProgramHeader() {
+        //program headder
         objectFile.println(".class public " + PROGRAM_HEADER_CLASS_NAME);
         objectFile.println(".super java/lang/Object");
-        objectFile.println();
-    }
-
-    private void writeLocalVarFields() {
+        objectFile.println();      
+        
+        //write local vars
         SymTab routineSymTab = (SymTab) symTabStack.getProgramId().getAttribute(SymTabKeyImpl.ROUTINE_SYMTAB);
         List<SymTabEntry> locals = routineSymTab.sortedEntries();
         for (SymTabEntry id : locals) {
@@ -84,10 +61,9 @@ public class CodeGenerator extends Backend
                 objectFile.println(".field private static " + fieldName + " " + typeCode);
             }
         }
-        objectFile.println();
-    }
+        objectFile.println();        
 
-    private void writeProgramClassConstructor() {
+        //program class constructor
         objectFile.println(".method public <init>()V");
         objectFile.println();
         objectFile.println("	aload_0");
@@ -98,20 +74,24 @@ public class CodeGenerator extends Backend
         objectFile.println(".limit stack 1");
         objectFile.println(".end method");
         objectFile.println();
-    }
-
-    private void writeMainMethodHeader() {
+        
+        //write main method
         objectFile.println(".method public static main([Ljava/lang/String;)V");
         objectFile.println();
-    }
 
-    private void writeMainMethodBody() {
         CodeGeneratorVisitor codeVisitor = new CodeGeneratorVisitor();
         Node rootNode = iCode.getRoot();
         rootNode.jjtAccept(codeVisitor, null);
-
+        
         objectFile.println();
         objectFile.println("    return");
         objectFile.println();
+        objectFile.println(".limit locals " + LOCALS_LIMIT);
+        objectFile.println(".limit stack  " + STACK_LIMIT);
+        objectFile.println(".end method");
+        objectFile.flush();
+
+        CodeGenerator.objectFile.close();
+        
     }
 }

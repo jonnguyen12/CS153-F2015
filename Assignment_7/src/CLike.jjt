@@ -132,7 +132,8 @@ TOKEN : {
    	| <END : "end">
  	{ debugStream.println("END token: " + matchedToken.image); }
  	| <PRINTLN : "printf">
- 	| <CIN : "cin">	 		  	 		
+ 	| <SCANF : "scanf">
+ 	| < RANDINT: "randInt" >  	 		
 
 }
 //Special Symbols
@@ -272,12 +273,6 @@ void Statement() #void :  {}
 	|LOOKAHEAD(2){System.out.println("=PARSING SIMPLE STATEMENT=");}
     SimpleStatement()
     {System.out.println("=END SIMPLE STATEMENT=");}
-	|{System.out.println("=PARSING FUNCTION DECLORATION=");}
-	 FunctionDeclaration()
-	 {System.out.println("=FUNCTION DECLORATION END=");}
-	|LOOKAHEAD(2){System.out.println("=PARSING FUNCTION CALL=");}
-	 FunctionCall()
-	 {System.out.println("=FUNCTION CALL END=");}	 
 	|{System.out.println("=PARSING IF STATEMENT=");}
 	 IfStatment()
 	 {System.out.println("=ENDING IF STATEMENT=");}
@@ -301,7 +296,7 @@ void Assignment() : {}
       }
     }
     < EQUAL >
-    expression()
+    (expression() | randInt())
     < SEMICOLON >
 }
 
@@ -365,29 +360,6 @@ void variableDeclaration() #void : {ArrayList<SymTabEntry> variableList;
         	programId.setAttribute(ROUTINE_LOCALS_COUNT, index);        }
 }
 
-
-
-void FunctionDeclaration() : {SimpleNode variableNode;}
-{
-	DataType()
-	< IDENTIFIER > {
-		//SymTabEntry functionId = symTabStack.enterLocal(token.image);
-		//functionId.setDefinition(DefinitionImpl.FUNCTION);		
-		//functionId.setAttribute(ROUTINE_ROUTINES, symTabStack.push());
-		//jjtThis.setAttribute(ID, functionId);
-	}
-	 <LEFT_PAREN > (DataType() < IDENTIFIER >(<COMMA > DataType() < IDENTIFIER >)*)* < RIGHT_PAREN > < LEFT_BRACKET > Statements() < RIGHT_BRACKET >
-}
-
-void FunctionCall() : {}
-{
-	< IDENTIFIER > <LEFT_PAREN > paramaterList() < RIGHT_PAREN > < SEMICOLON >
-}
-
-void paramaterList() #void : {}
-{
-	(expression() (<COMMA > expression())*)*
-}
 
 //statments such as (z*z;)
 void SimpleStatement() : {}
@@ -456,10 +428,13 @@ void println() : {}
 
 void userInput() : {}
 {
-    <CIN> <LEFT_PAREN> identifier() <RIGHT_PAREN> <SEMICOLON>
+    <SCANF> <LEFT_PAREN> identifier() <RIGHT_PAREN> <SEMICOLON>
 }
 
-
+void randInt() : {}
+{
+    <RANDINT> <LEFT_PAREN> integerConstant() <RIGHT_PAREN>
+}
 
 void integerConstant() : {}
 {

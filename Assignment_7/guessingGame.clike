@@ -1,0 +1,49 @@
+int difficulty,numGuesses,numToGuess,guess;
+
+printf("NUMBER GUESSING GAME: ENTER A DIFFICULTY");
+printf("1 - EASY - 5 GUESSES - 0-10");
+printf("2 - MEDIUM - 7 GUESSES - 0-100");
+printf("3 - HARD - 11 GUESSES - 0-1000");
+
+scanf(difficulty);
+numGuesses = -1;
+if (difficulty == 1) {
+	numGuesses = 5;
+	numToGuess = randInt(10);
+}
+if (difficulty == 2) {
+	numGuesses = 7;
+	numToGuess = randInt(100);	
+}
+if (difficulty == 3) {
+	numGuesses = 11;
+	numToGuess = randInt(1000);	
+}
+
+while(numGuesses > 0) {
+	printf("ENTER A NUMBER TO GUESS: ");
+	scanf(guess);
+	if(guess == numToGuess) {
+		printf("CORRECT YOU WIN!");
+		numGuesses = -1;	
+	}
+	if (guess < numToGuess) {
+		printf("GUESSED TOO LOW TRY AGAIN");
+		numGuesses = numGuesses - 1;
+		printf("GUESSES LEFT: ");		
+		printf(numGuesses);
+		printf("");
+				
+	}
+	if (guess > numToGuess) {
+		printf("GUESSED TOO HIGH TRY AGAIN");
+		numGuesses = numGuesses - 1;		
+		printf("GUESSES LEFT: ");		
+		printf(numGuesses);	
+		printf("");			
+	}
+}
+
+if (numGuesses == 0) {
+	printf("OUT OF GUESSES, GAME OVER");
+}
